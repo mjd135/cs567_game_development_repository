@@ -1,0 +1,7 @@
+*.user
+*.suo
+*.cachefile
+_Resharper*
+Debug
+Release
+*scc
