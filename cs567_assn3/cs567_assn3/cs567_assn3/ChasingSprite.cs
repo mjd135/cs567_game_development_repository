@@ -13,10 +13,10 @@ namespace cs567_assn3
 
         public ChasingSprite(Texture2D textureImage, Vector2 position,
             Point frameSize, int collisionOffset, Point currentFrame,
-            Point sheetSize, Vector2 speed, string collisionCueName,
+            Point sheetSize, Vector2 speed, string cueName,
             SpriteManager spriteManager, int numFrames, int frame)
             : base(textureImage, position, frameSize, collisionOffset,
-            currentFrame, sheetSize, speed, collisionCueName, numFrames, frame)
+            currentFrame, sheetSize, speed, cueName, numFrames, frame)
         {
             this.spriteManager = spriteManager;
         }

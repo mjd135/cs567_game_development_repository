@@ -35,21 +35,21 @@ namespace cs567_assn3
             get;
         }
         //Collision Cue Name
-        public string collisionCueName { get; set; }
+        public string cueName { get; set; }
 
         //Constructors
         public Sprite(Texture2D textureImage, Vector2 position, Point frameSize, 
             int collisionOffset, Point currentFrame, Point sheetSize, Vector2 speed,
-            string collisionCueName, int numFrames, int frame)
+            string cueName, int numFrames, int frame)
             : this(textureImage, position, frameSize, collisionOffset, currentFrame,
-            sheetSize, speed, defaultMillisecondsPerFrame, collisionCueName, numFrames, frame)
+            sheetSize, speed, defaultMillisecondsPerFrame, cueName, numFrames, frame)
         {
 
         }
 
         public Sprite(Texture2D textureImage, Vector2 position, Point frameSize, 
             int collisionOffset, Point currentFrame, Point sheetSize, Vector2 speed,
-            int millisecondsPerFrame, string collisionCueName, int numFrames, int frame)
+            int millisecondsPerFrame, string cueName, int numFrames, int frame)
         {
             this.textureImage = textureImage;
             this.position = position;
@@ -58,7 +58,7 @@ namespace cs567_assn3
             this.sheetSize = sheetSize;
             this.speed = speed;
             this.millisecondsPerFrame = millisecondsPerFrame;
-            this.collisionCueName = collisionCueName;
+            this.cueName = cueName;
             this.numFrames = numFrames;
             this.frame = frame;
         }

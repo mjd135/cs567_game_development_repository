@@ -28,12 +28,12 @@ namespace cs567_assn3
             player = new UserControlledSprite(
                 Game.Content.Load<Texture2D>(@"Images/SamusRunning"),
                 Vector2.Zero, new Point(90, 90), 30, new Point (0,0),
-                new Point(4,3), new Vector2(6, 6),100, 10, 0);
+                new Point(4,3), new Vector2(6, 6),"Running",100, 10, 0);
 
             spriteList.Add(
                 new ChasingSprite(Game.Content.Load<Texture2D>(@"Images/WolfRunning"),
-                new Vector2(150, 150), new Point(111, 56), 10, new Point(0, 0),
-                new Point(6,1), Vector2.One, null, this, 6, 0));
+                new Vector2(250, 250), new Point(111, 56), 10, new Point(0, 0),
+                new Point(6,1), Vector2.One, "Boss5", this, 6, 0));
 
             base.LoadContent();
         }
@@ -45,9 +45,10 @@ namespace cs567_assn3
             foreach(Sprite s in spriteList)
             {
                 s.Update(gameTime, Game.Window.ClientBounds);
-
+                
                 if (s.CollisionRect.Intersects(player.CollisionRect))
-                    Game.Exit();
+                    ((Game1)Game).PlayCue(s.cueName);
+                    //Game.Exit();
             }
 
             base.Update(gameTime);
@@ -71,5 +72,7 @@ namespace cs567_assn3
         {
             return player.GetPosition;
         }
+
+
     }
 }

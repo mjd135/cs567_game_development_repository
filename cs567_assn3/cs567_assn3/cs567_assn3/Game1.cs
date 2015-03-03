@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 
+
 namespace cs567_assn3
 {
     /// <summary>
@@ -16,6 +17,12 @@ namespace cs567_assn3
     /// </summary>
     public class Game1 : Microsoft.Xna.Framework.Game
     {
+        AudioEngine audioEngine;
+        WaveBank waveBank;
+        SoundBank soundBank;
+        SoundEffect soundEffect;
+        Cue trackCue;
+
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
@@ -35,7 +42,7 @@ namespace cs567_assn3
         SpriteManager spriteManager;
 
         public Game1()
-        {
+        {            
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
@@ -67,7 +74,10 @@ namespace cs567_assn3
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-
+            audioEngine = new AudioEngine(@"Content\Audio\GameAudio.xgs");
+            waveBank = new WaveBank(audioEngine, @"Content\Audio\Wave Bank.xwb");
+            soundBank = new SoundBank(audioEngine, @"Content\Audio\Sound Bank.xsb");
+            soundEffect = Content.Load<SoundEffect>(@"Audio\Running");
             // TODO: use this.Content to load your game content here
         }
 
@@ -121,6 +131,11 @@ namespace cs567_assn3
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
+        }
+
+        public void PlayCue(string cueName)
+        {
+            soundBank.PlayCue(cueName);
         }
     }
 }

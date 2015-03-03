@@ -33,18 +33,18 @@ namespace cs567_assn3
 
         public UserControlledSprite(Texture2D textureImage, Vector2 position,
             Point frameSize, int collisionOffset, Point currentFrame, Point sheetSize,
-            Vector2 speed, int numFrames, int frame)
+            Vector2 speed, string cueName, int numFrames, int frame)
             : base(textureImage, position, frameSize, collisionOffset, currentFrame,
-                sheetSize, speed, null, numFrames, frame)
+                sheetSize, speed, cueName, numFrames, frame)
         {
 
         }
 
         public UserControlledSprite(Texture2D textureImage, Vector2 position,
             Point frameSize, int collisionOffset, Point currentFrame, Point sheetSize,
-            Vector2 speed, int millisecondsPerFrame, int numFrames, int frame)
+            Vector2 speed, string cueName, int millisecondsPerFrame, int numFrames, int frame)
             : base(textureImage, position, frameSize, collisionOffset, currentFrame, 
-            sheetSize, speed, millisecondsPerFrame, null, numFrames, frame)
+            sheetSize, speed, millisecondsPerFrame, cueName, numFrames, frame)
         {
 
         }
@@ -56,6 +56,7 @@ namespace cs567_assn3
             MouseState currMouseState = Mouse.GetState();
             if(currMouseState.X != prevMouseState.X || currMouseState.Y != prevMouseState.Y)
             {
+                
                 position = new Vector2(currMouseState.X, currMouseState.Y);
             }
             prevMouseState = currMouseState;
