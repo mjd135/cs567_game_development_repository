@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace cs567_assn3
 {
@@ -14,6 +15,10 @@ namespace cs567_assn3
         UserControlledSprite player;
 
         List<Sprite> spriteList = new List<Sprite>();
+
+        float delay;
+        float time;
+        bool gameOver = false;
 
         public SpriteManager(Game game)
             :base(game)
@@ -28,7 +33,7 @@ namespace cs567_assn3
             player = new UserControlledSprite(
                 Game.Content.Load<Texture2D>(@"Images/SamusRunning"),
                 Vector2.Zero, new Point(90, 90), 30, new Point (0,0),
-                new Point(4,3), new Vector2(6, 6),"Running",100, 10, 0);
+                new Point(4,3), new Vector2(6, 6), "Victory Against Metroid",100, 10, 0);
 
             spriteList.Add(
                 new ChasingSprite(Game.Content.Load<Texture2D>(@"Images/WolfRunning"),
@@ -41,14 +46,33 @@ namespace cs567_assn3
         public override void Update(GameTime gameTime)
         {
             player.Update(gameTime, Game.Window.ClientBounds);
-
-            foreach(Sprite s in spriteList)
+            
+            
+            for (int i = 0; i < spriteList.Count; i++ )
             {
+                Sprite s = spriteList[i];
                 s.Update(gameTime, Game.Window.ClientBounds);
                 
                 if (s.CollisionRect.Intersects(player.CollisionRect))
+                {
                     ((Game1)Game).PlayCue(s.cueName);
-                    //Game.Exit();
+                    spriteList.RemoveAt(i);
+                    i--;
+                }
+                if (spriteList.Count == 0)
+                    gameOver = true;
+            }
+            if (gameOver == true)
+            {
+                delay = 1f;
+                time += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (time > delay)
+                {
+                    ((Game1)Game).PlayCue(player.cueName);
+                    gameOver = false;
+                }
+                    
+
             }
 
             base.Update(gameTime);

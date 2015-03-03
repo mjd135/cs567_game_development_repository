@@ -22,6 +22,8 @@ namespace cs567_assn3
         SoundBank soundBank;
         SoundEffect soundEffect;
         Cue trackCue;
+        Song themeSong;
+        bool songStart = false;
 
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -77,7 +79,8 @@ namespace cs567_assn3
             audioEngine = new AudioEngine(@"Content\Audio\GameAudio.xgs");
             waveBank = new WaveBank(audioEngine, @"Content\Audio\Wave Bank.xwb");
             soundBank = new SoundBank(audioEngine, @"Content\Audio\Sound Bank.xsb");
-            soundEffect = Content.Load<SoundEffect>(@"Audio\Running");
+            themeSong = Content.Load<Song>(@"Audio\Theme");
+            MediaPlayer.IsRepeating = true;
             // TODO: use this.Content to load your game content here
         }
 
@@ -102,7 +105,11 @@ namespace cs567_assn3
                 this.Exit();
 
             // TODO: Add your update logic here
-
+            if (!songStart)
+            {
+                MediaPlayer.Play(themeSong);
+                songStart = true;
+            }
             base.Update(gameTime);
         }
 
