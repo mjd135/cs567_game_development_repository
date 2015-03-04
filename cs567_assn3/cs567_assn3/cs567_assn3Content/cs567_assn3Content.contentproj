@@ -88,13 +88,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Audio\Metroid.WAV">
-      <Name>Metroid</Name>
-      <Importer>WavImporter</Importer>
-      <Processor>SoundEffectProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Audio\Theme.mp3">
       <Name>Theme</Name>
       <Importer>Mp3Importer</Importer>
