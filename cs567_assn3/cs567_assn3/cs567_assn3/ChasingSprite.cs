@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace cs567_assn3
 {
-    class ChasingSprite : Sprite
+    internal class ChasingSprite : Sprite
     {
-        SpriteManager spriteManager;
+        private SpriteManager spriteManager;
 
         public ChasingSprite(Texture2D textureImage, Vector2 position,
             Point frameSize, int collisionOffset, Point currentFrame,
@@ -26,7 +24,7 @@ namespace cs567_assn3
             get { return speed; }
         }
 
-        public override void Update(GameTime gameTime, Rectangle clientBounds)
+        public override void Update(GameTime gameTime, Rectangle clientBounds, SoundEffect soundEffect)
         {
             Vector2 player = spriteManager.GetPlayerPosition();
 
@@ -43,7 +41,7 @@ namespace cs567_assn3
             else if (player.Y > position.Y)
                 position.Y += speedVal;
 
-            base.Update(gameTime, clientBounds);
+            base.Update(gameTime, clientBounds, soundEffect);
         }
     }
 }

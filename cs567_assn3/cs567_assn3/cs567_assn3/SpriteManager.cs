@@ -1,29 +1,26 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
 
 namespace cs567_assn3
 {
-    class SpriteManager : Microsoft.Xna.Framework.DrawableGameComponent
+    internal class SpriteManager : Microsoft.Xna.Framework.DrawableGameComponent
     {
-        SpriteBatch spriteBatch;
+        private SpriteBatch spriteBatch;
 
-        UserControlledSprite player;
+        private UserControlledSprite player;
+        private SoundEffect soundEffect;
 
-        List<Sprite> spriteList = new List<Sprite>();
+        private List<Sprite> spriteList = new List<Sprite>();
 
-        float delay;
-        float time;
-        bool gameOver = false;
+        private float delay;
+        private float time;
+        private bool gameOver = false;
 
         public SpriteManager(Game game)
-            :base(game)
+            : base(game)
         {
-
         }
 
         protected override void LoadContent()
@@ -32,27 +29,28 @@ namespace cs567_assn3
 
             player = new UserControlledSprite(
                 Game.Content.Load<Texture2D>(@"Images/SamusRunning"),
-                Vector2.Zero, new Point(90, 90), 30, new Point (0,0),
-                new Point(4,3), new Vector2(6, 6), "Victory Against Metroid",100, 10, 0);
+                Vector2.Zero, new Point(90, 90), 30, new Point(0, 0),
+                new Point(4, 3), new Vector2(6, 6), "Victory Against Metroid", 100, 10, 0);
 
             spriteList.Add(
                 new ChasingSprite(Game.Content.Load<Texture2D>(@"Images/WolfRunning"),
                 new Vector2(250, 250), new Point(111, 56), 10, new Point(0, 0),
-                new Point(6,1), Vector2.One, "Boss5", this, 6, 0));
+                new Point(6, 1), Vector2.One, "Boss5", this, 6, 0));
+
+            soundEffect = Game.Content.Load<SoundEffect>(@"Audio\Running");
 
             base.LoadContent();
         }
 
         public override void Update(GameTime gameTime)
         {
-            player.Update(gameTime, Game.Window.ClientBounds);
-            
-            
-            for (int i = 0; i < spriteList.Count; i++ )
+            player.Update(gameTime, Game.Window.ClientBounds, soundEffect);
+
+            for (int i = 0; i < spriteList.Count; i++)
             {
                 Sprite s = spriteList[i];
-                s.Update(gameTime, Game.Window.ClientBounds);
-                
+                s.Update(gameTime, Game.Window.ClientBounds, null);
+
                 if (s.CollisionRect.Intersects(player.CollisionRect))
                 {
                     ((Game1)Game).PlayCue(s.cueName);
@@ -71,8 +69,6 @@ namespace cs567_assn3
                     ((Game1)Game).PlayCue(player.cueName);
                     gameOver = false;
                 }
-                    
-
             }
 
             base.Update(gameTime);
@@ -83,7 +79,7 @@ namespace cs567_assn3
             spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend);
 
             player.Draw(gameTime, spriteBatch);
-            foreach(Sprite s in spriteList)
+            foreach (Sprite s in spriteList)
             {
                 s.Draw(gameTime, spriteBatch);
             }
@@ -96,7 +92,5 @@ namespace cs567_assn3
         {
             return player.GetPosition;
         }
-
-
     }
 }

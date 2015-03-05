@@ -1,53 +1,53 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace cs567_assn3
 {
-    abstract class Sprite
+    internal abstract class Sprite
     {
         //Sprite Draw
-        Texture2D textureImage;
+        private Texture2D textureImage;
+
         protected Point frameSize;
-        Point currentFrame;
-        Point sheetSize;
-        int numFrames;
-        int frame;
+        private Point currentFrame;
+        private Point sheetSize;
+        private int numFrames;
+        private int frame;
+
         //Collision
-        int collisionOffset;
+        private int collisionOffset;
 
         //Framerate
-        int timeSinceLastFrame = 0;
-        int millisecondsPerFrame;
-        const int defaultMillisecondsPerFrame = 16;
+        private int timeSinceLastFrame = 0;
 
-        //Movement 
+        private int millisecondsPerFrame;
+        private const int defaultMillisecondsPerFrame = 16;
+
+        //Movement
         protected Vector2 speed;
+
         protected Vector2 position;
-        
 
         //Abstract definition of direction property
         public abstract Vector2 Direction
         {
             get;
         }
+
         //Collision Cue Name
         public string cueName { get; set; }
 
         //Constructors
-        public Sprite(Texture2D textureImage, Vector2 position, Point frameSize, 
+        public Sprite(Texture2D textureImage, Vector2 position, Point frameSize,
             int collisionOffset, Point currentFrame, Point sheetSize, Vector2 speed,
             string cueName, int numFrames, int frame)
             : this(textureImage, position, frameSize, collisionOffset, currentFrame,
             sheetSize, speed, defaultMillisecondsPerFrame, cueName, numFrames, frame)
         {
-
         }
 
-        public Sprite(Texture2D textureImage, Vector2 position, Point frameSize, 
+        public Sprite(Texture2D textureImage, Vector2 position, Point frameSize,
             int collisionOffset, Point currentFrame, Point sheetSize, Vector2 speed,
             int millisecondsPerFrame, string cueName, int numFrames, int frame)
         {
@@ -70,35 +70,22 @@ namespace cs567_assn3
                 1f, SpriteEffects.None, 0);
         }
 
-        public virtual void Update(GameTime gameTime, Rectangle clientBounds)
+        public virtual void Update(GameTime gameTime, Rectangle clientBounds, SoundEffect soundEffect)
         {
-            
             timeSinceLastFrame += gameTime.ElapsedGameTime.Milliseconds;
-            //if(timeSinceLastFrame > millisecondsPerFrame)
-            //{
-            //    timeSinceLastFrame = 0;
-            //    ++currentFrame.X;
-            //    if(currentFrame.X >= sheetSize.X)
-            //    {
-            //        currentFrame.X = 0;
-            //        ++currentFrame.Y;
-            //        if (currentFrame.Y >= sheetSize.Y)
-            //            currentFrame.Y = 0;
-            //    }
-            //}
 
-            if (timeSinceLastFrame>millisecondsPerFrame)
+            if (timeSinceLastFrame > millisecondsPerFrame)
             {
                 frame++;
                 currentFrame.X++;
                 timeSinceLastFrame = 0;
-                if(frame >= numFrames)
+                if (frame >= numFrames)
                 {
                     currentFrame.X = 0;
                     currentFrame.Y = 0;
                     frame = 1;
                 }
-                else if(currentFrame.X >= sheetSize.X)
+                else if (currentFrame.X >= sheetSize.X)
                 {
                     currentFrame.X = 0;
                     frame++;
@@ -108,8 +95,6 @@ namespace cs567_assn3
                         currentFrame.Y = 0;
                         frame = 0;
                     }
-                        
-
                 }
             }
         }
@@ -130,10 +115,5 @@ namespace cs567_assn3
         {
             get { return position; }
         }
-
-        
-        
-
-        
     }
 }

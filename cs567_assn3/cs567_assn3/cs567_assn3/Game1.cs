@@ -1,14 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
-
 
 namespace cs567_assn3
 {
@@ -17,22 +11,21 @@ namespace cs567_assn3
     /// </summary>
     public class Game1 : Microsoft.Xna.Framework.Game
     {
-        AudioEngine audioEngine;
-        WaveBank waveBank;
-        SoundBank soundBank;
-        SoundEffect soundEffect;
-        Cue trackCue;
-        Song themeSong;
-        bool songStart = false;
+        private AudioEngine audioEngine;
+        private WaveBank waveBank;
+        private SoundBank soundBank;
+        private SoundEffect soundEffect;
+        private Cue trackCue;
+        private Song themeSong;
+        private bool songStart = false;
 
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+        private GraphicsDeviceManager graphics;
+        private SpriteBatch spriteBatch;
 
-        Texture2D background;
+        private Texture2D background;
         private Vector2 cameraPosition = Vector2.Zero;
         private const float cameraSpeed = 1.0f;
 
-        
         private Texture2D backGround1;
         private Texture2D backGround2;
         private float backGroundScale = 2.0f;
@@ -41,10 +34,10 @@ namespace cs567_assn3
         private float layer1Scroll = 1.0f;
         private float layer2Scroll = 3.0f;
 
-        SpriteManager spriteManager;
+        private SpriteManager spriteManager;
 
         public Game1()
-        {            
+        {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
@@ -80,6 +73,7 @@ namespace cs567_assn3
             waveBank = new WaveBank(audioEngine, @"Content\Audio\Wave Bank.xwb");
             soundBank = new SoundBank(audioEngine, @"Content\Audio\Sound Bank.xsb");
             themeSong = Content.Load<Song>(@"Audio\Theme");
+            
             MediaPlayer.IsRepeating = true;
             // TODO: use this.Content to load your game content here
         }
@@ -129,10 +123,8 @@ namespace cs567_assn3
              null,
              screenMatrix);
 
-            spriteBatch.Draw(background, new Rectangle(0,0, Window.ClientBounds.Width,
+            spriteBatch.Draw(background, new Rectangle(0, 0, Window.ClientBounds.Width,
                 Window.ClientBounds.Height), null, Color.White, 0, Vector2.Zero, SpriteEffects.None, 1);
-
-
 
             spriteBatch.End();
             // TODO: Add your drawing code here
