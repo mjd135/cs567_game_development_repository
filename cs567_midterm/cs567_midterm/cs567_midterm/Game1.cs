@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using FarseerPhysics.Dynamics;
 
 namespace cs567_midterm
 {
@@ -28,7 +29,7 @@ namespace cs567_midterm
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         private SpriteManager spriteManager;
-
+        
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
