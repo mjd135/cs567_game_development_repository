@@ -17,8 +17,31 @@ namespace cs567_assn5
     /// </summary>
     public class Game1 : Microsoft.Xna.Framework.Game
     {
+        private AudioEngine audioEngine;
+        private WaveBank waveBank;
+        private SoundBank soundBank;
+        private SoundEffect soundEffect;
+        private Cue trackCue;
+        private Song themeSong;
+
+        private Vector2 cameraPosition = Vector2.Zero;
+        private const float cameraSpeed = 1.0f;
+
+        private Texture2D backGround0;
+        private Texture2D backGround1;
+        private Texture2D backGround2;
+        private float backGroundScale = 2.0f;
+        private float backGroundScale1 = 2.5f;
+        private float layer0Scroll = .25f;
+        private float layer1Scroll = 1.0f;
+        private float layer2Scroll = 3.0f;
+
+
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+
+        private int timeSinceLastFrame = 0;
+        private int millisecondsPerFrame = 100;
 
         World world;
 
@@ -50,6 +73,14 @@ namespace cs567_assn5
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            backGround0 = Content.Load<Texture2D>(@"Images/Background");
+            backGround1 = Content.Load<Texture2D>(@"Images/Bridge");
+            backGround2 = Content.Load<Texture2D>(@"Images/Walkway");
+
+            //audioEngine = new AudioEngine(@"Content\Audio\GameAudio.xgs");
+            //waveBank = new WaveBank(audioEngine, @"Content\Audio\Wave Bank.xwb");
+            //soundBank = new SoundBank(audioEngine, @"Content\Audio\Sound Bank.xsb");
+            //themeSong = Content.Load<Song>(@"Audio\Theme");
             // TODO: use this.Content to load your game content here
         }
 
@@ -75,6 +106,17 @@ namespace cs567_assn5
 
             // TODO: Add your update logic here
 
+            KeyboardState keyboardState = Keyboard.GetState();
+            if (keyboardState.IsKeyDown(Keys.Left))
+                cameraPosition.X -= cameraSpeed;
+            if (keyboardState.IsKeyDown(Keys.Right))
+                cameraPosition.X += cameraSpeed;
+            if (keyboardState.IsKeyDown(Keys.Up))
+                cameraPosition.Y -= cameraSpeed;
+            if (keyboardState.IsKeyDown(Keys.Down))
+                cameraPosition.Y += cameraSpeed;
+
+
             base.Update(gameTime);
         }
 
@@ -86,9 +128,43 @@ namespace cs567_assn5
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            Matrix screenMatrix = Matrix.CreateTranslation(new Vector3(-cameraPosition, 0));
+            // spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
+            spriteBatch.Begin(SpriteSortMode.Immediate,
+             BlendState.AlphaBlend,
+             SamplerState.PointWrap,
+             DepthStencilState.Default,
+             RasterizerState.CullCounterClockwise,
+             null,
+             screenMatrix);
 
+
+            spriteBatch.Draw(backGround0, new Vector2(cameraPosition.X, 0),
+                new Rectangle((int)Math.Round(cameraPosition.X * layer0Scroll / backGroundScale1),
+                    0, Window.ClientBounds.Width, Window.ClientBounds.Height), Color.White, 0.0f, Vector2.Zero, backGroundScale1,
+                    SpriteEffects.None, 0);
+
+            //second layer
+            spriteBatch.Draw(backGround1, new Vector2(cameraPosition.X, 180),
+                new Rectangle((int)Math.Round(cameraPosition.X * layer1Scroll / backGroundScale),
+                    0, 1000, 130), Color.White, 0.0f, Vector2.Zero, backGroundScale,
+                    SpriteEffects.None, 0);
+
+            //first layer
+            spriteBatch.Draw(backGround2, new Vector2(cameraPosition.X, 250),
+                new Rectangle((int)Math.Round(cameraPosition.X * layer2Scroll / backGroundScale),
+                    0, 800, 130), Color.White, 0.0f, Vector2.Zero, backGroundScale,
+                    SpriteEffects.None, 0);
+
+
+            // TODO: Add your drawing code here
+            spriteBatch.End();
             base.Draw(gameTime);
+        }
+
+        public void PlayCue(string cueName)
+        {
+            soundBank.PlayCue(cueName);
         }
     }
 }
