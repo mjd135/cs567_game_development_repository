@@ -41,16 +41,23 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Images\Bridge.PNG">
-      <Name>Bridge</Name>
+    <Compile Include="Images\Walkway.PNG">
+      <Name>Walkway</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <ProcessorParameters_ColorKeyColor>255, 255, 255, 255</ProcessorParameters_ColorKeyColor>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Images\Walkway.PNG">
-      <Name>Walkway</Name>
+    <Compile Include="Images\SamusRunning.PNG">
+      <Name>SamusRunning</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Images\spacePirate.PNG">
+      <Name>spacePirate</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <ProcessorParameters_ColorKeyColor>255, 255, 255, 255</ProcessorParameters_ColorKeyColor>

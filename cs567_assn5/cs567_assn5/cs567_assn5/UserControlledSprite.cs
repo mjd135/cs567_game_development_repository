@@ -57,7 +57,7 @@ namespace cs567_assn5
                 time += (float)gameTime.ElapsedGameTime.TotalSeconds;
                 if (time > delay)
                 {
-                    soundEffect.Play();
+                    //soundEffect.Play();
                     time = 0f;
                 }
 
