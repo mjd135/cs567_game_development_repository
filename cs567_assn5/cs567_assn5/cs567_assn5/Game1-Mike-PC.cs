@@ -1,14 +1,18 @@
-using FarseerPhysics;
-using FarseerPhysics.Common;
-using FarseerPhysics.Dynamics;
-using FarseerPhysics.Dynamics.Contacts;
-using FarseerPhysics.Factories;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
-using System;
+using FarseerPhysics.Dynamics;
+using FarseerPhysics.Factories;
+using FarseerPhysics;
+using FarseerPhysics.Dynamics.Contacts;
+using FarseerPhysics.Common;
 
 namespace cs567_assn5
 {
@@ -17,10 +21,9 @@ namespace cs567_assn5
     /// </summary>
     public class Game1 : Microsoft.Xna.Framework.Game
     {
-        private enum Type { walkway, Player, Enemy, PowerBeam };
-        private bool moving;
-        private bool jump;
-        private bool shoot = false;
+        enum Type { walkway, Player, Enemy, PowerBeam };
+        bool jump;
+        bool shoot;
         private AudioEngine audioEngine;
         private WaveBank waveBank;
         private SoundBank soundBank;
@@ -28,58 +31,45 @@ namespace cs567_assn5
         private Cue trackCue;
         private Song themeSong;
 
-
-
         private Vector2 cameraPosition = Vector2.Zero;
-        private const float cameraSpeed = 2.0f;
+        private const float cameraSpeed = 1.0f;
 
-        private Texture2D backGround;
+        private Texture2D backGround;        
         private Texture2D walkway;
         private float backGroundScale = 2.0f;
         private float backGroundScale1 = 2.5f;
-        private float layer0Scroll = .25f;
+        private float layer0Scroll = .25f;        
         private float layer2Scroll = 3.0f;
-
         public Vector2 walkwayPosition { get; set; }
-
         public Body walkwayBody { get; set; }
-
         public Rectangle walkwayRectangle { get; set; }
-
         public Vector2 walkwayScale { get; set; }
 
-        private Texture2D powerBeam;
-        private Texture2D pirate;
-        private Texture2D samus;
-
+        Texture2D powerBeam;
+        Texture2D pirate;
+        Texture2D samus;
         public Vector2 PlayerPosition { get; set; }
-
         public Body PlayerBody { get; set; }
-
         public Rectangle PlayerRectangle { get; set; }
-
         public Vector2 PlayerScale { get; set; }
 
         public Vector2 EnemyPosition { get; set; }
-
         public Body EnemyBody { get; set; }
-
         public Rectangle EnemyRectangle { get; set; }
-
         public Vector2 EnemyScale { get; set; }
 
         public Vector2 PowerBeamPosition { get; set; }
-
         public Body PowerBeamBody { get; set; }
-
         public Rectangle PowerBeamRectangle { get; set; }
-
         public Vector2 PowerBeamScale { get; set; }
 
-        private GraphicsDeviceManager graphics;
-        private SpriteBatch spriteBatch;
+        GraphicsDeviceManager graphics;
+        SpriteBatch spriteBatch;
+        private SpriteManager spriteManager;
+        private int timeSinceLastFrame = 0;
+        private int millisecondsPerFrame = 100;
 
-        private World world;
+        World world;
 
         public Game1()
         {
@@ -93,7 +83,7 @@ namespace cs567_assn5
         /// related content.  Calling base.Initialize will enumerate through any components
         /// and initialize them as well.
         /// </summary>
-        ///
+        /// 
 
         private Vertices GetBounds()
         {
@@ -109,6 +99,7 @@ namespace cs567_assn5
             return bounds;
         }
 
+
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
@@ -123,8 +114,7 @@ namespace cs567_assn5
         /// </summary>
         protected override void LoadContent()
         {
-            world = new World(new Vector2(0, 9.4f));
-
+            world = new World(new Vector2(0, 9.8f));
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             samus = Content.Load<Texture2D>(@"Images/SamusRunning");
@@ -139,34 +129,35 @@ namespace cs567_assn5
             PlayerPosition = new Vector2(300, 100);
             PlayerBody.Position = new Vector2(ConvertUnits.ToSimUnits(PlayerPosition.X), ConvertUnits.ToSimUnits(PlayerPosition.Y));
             PlayerBody.BodyType = BodyType.Dynamic;
-            PlayerBody.OnCollision += OnCollision; //registers the OnCollision method to the OnCollision delegate
+            PlayerBody.OnCollision += OnCollision; //registers the OnCollision method to the OnCollision delegate 
             PlayerBody.UserData = Type.Player;
             PlayerBody.Friction = 1.0f;
+
 
             EnemyRectangle = new Rectangle(0, 0, 41, 52);
             EnemyScale = new Vector2(1.5f, 1.5f);
             EnemyBody = BodyFactory.CreateRectangle(world, ConvertUnits.ToSimUnits(EnemyRectangle.Width * EnemyScale.X), ConvertUnits.ToSimUnits(EnemyRectangle.Height * EnemyScale.Y), 1);
-            EnemyPosition = new Vector2(700, 100);
+            EnemyPosition = new Vector2(500, 100);
             EnemyBody.Position = new Vector2(ConvertUnits.ToSimUnits(EnemyPosition.X), ConvertUnits.ToSimUnits(EnemyPosition.Y));
             EnemyBody.BodyType = BodyType.Dynamic;
-            EnemyBody.OnCollision += OnCollision; //registers the OnCollision method to the OnCollision delegate
+            EnemyBody.OnCollision += OnCollision; //registers the OnCollision method to the OnCollision delegate 
             EnemyBody.UserData = Type.Enemy;
-            EnemyBody.Friction = 1.0f;
+            EnemyBody.Friction = 0.0f;
+
 
             PowerBeamRectangle = new Rectangle(8, 5, 14, 14);
             PowerBeamScale = new Vector2(1.5f, 1.5f);
             PowerBeamBody = BodyFactory.CreateRectangle(world, ConvertUnits.ToSimUnits(PowerBeamRectangle.Width * PowerBeamScale.X), ConvertUnits.ToSimUnits(PowerBeamRectangle.Height * PowerBeamScale.Y), 1);
-            PowerBeamPosition = new Vector2(360, 300);
+            PowerBeamPosition = new Vector2(0, 0);
             PowerBeamBody.Position = new Vector2(ConvertUnits.ToSimUnits(PowerBeamPosition.X), ConvertUnits.ToSimUnits(PowerBeamPosition.Y));
             PowerBeamBody.BodyType = BodyType.Dynamic;
-            PowerBeamBody.OnCollision += OnCollision; //registers the OnCollision method to the OnCollision delegate
+            PowerBeamBody.OnCollision += OnCollision; //registers the OnCollision method to the OnCollision delegate 
             PowerBeamBody.UserData = Type.PowerBeam;
             PowerBeamBody.Friction = 0.0f;
-            PowerBeamBody.Awake = false;
-            PowerBeamBody.IgnoreGravity = true;
+
 
             backGround = Content.Load<Texture2D>(@"Images/Background");
-
+            
             walkway = Content.Load<Texture2D>(@"Images/Walkway");
 
             walkwayScale = new Vector2(2.0f, 2.0f);
@@ -177,8 +168,12 @@ namespace cs567_assn5
             walkwayBody.BodyType = BodyType.Static;
             walkwayBody.OnCollision += OnCollision;
             walkwayBody.UserData = Type.walkway;
+            
 
-            ;
+            //audioEngine = new AudioEngine(@"Content\Audio\GameAudio.xgs");
+            //waveBank = new WaveBank(audioEngine, @"Content\Audio\Wave Bank.xwb");
+            //soundBank = new SoundBank(audioEngine, @"Content\Audio\Sound Bank.xsb");
+            //themeSong = Content.Load<Song>(@"Audio\Theme");
             // TODO: use this.Content to load your game content here
         }
 
@@ -186,7 +181,7 @@ namespace cs567_assn5
         /// UnloadContent will be called once per game and is the place to unload
         /// all content.
         /// </summary>
-        ///
+        /// 
 
         protected override void UnloadContent()
         {
@@ -200,9 +195,6 @@ namespace cs567_assn5
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-
-            
-            
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
@@ -212,37 +204,30 @@ namespace cs567_assn5
             KeyboardState keyboardState = Keyboard.GetState();
             if (keyboardState.IsKeyDown(Keys.Left))
             {
-                //PlayerBody.ApplyLinearImpulse(new Vector2(-0.15f, 0));
+                PlayerBody.ApplyLinearImpulse(new Vector2(-0.15f, 0));
                 cameraPosition.X -= cameraSpeed;
-
-                
             }
-
+                
             if (keyboardState.IsKeyDown(Keys.Right))
             {
                 PlayerBody.ApplyLinearImpulse(new Vector2(0.15f, 0));
                 cameraPosition.X += cameraSpeed;
-                
             }
             if (keyboardState.IsKeyDown(Keys.Up))
                 jump = true;
-
+                
             if (keyboardState.IsKeyDown(Keys.Down))
                 cameraPosition.Y = cameraSpeed;
             if (keyboardState.IsKeyDown(Keys.Space))
             {
                 shoot = true;
-            }
-
-            if (shoot == true)
-            {
-                PowerBeamPosition = new Vector2(ConvertUnits.ToDisplayUnits(PowerBeamBody.Position.X),
-                    ConvertUnits.ToDisplayUnits(PowerBeamBody.Position.Y));
-                PowerBeamBody.Awake = true;
+                //PowerBeamBody.GravityScale = -.10f;
                 PowerBeamBody.ApplyForce(new Vector2(1.0f, 0f));
+                //shoot = false;
             }
+                
 
-            if (jump == true)
+            if(jump == true)
             {
                 if (keyboardState.IsKeyUp(Keys.Up))
                 {
@@ -251,13 +236,12 @@ namespace cs567_assn5
                 }
             }
 
-
-
             PlayerPosition = new Vector2(ConvertUnits.ToDisplayUnits(PlayerBody.Position.X),
                ConvertUnits.ToDisplayUnits(PlayerBody.Position.Y));
             EnemyPosition = new Vector2(ConvertUnits.ToDisplayUnits(EnemyBody.Position.X),
                 ConvertUnits.ToDisplayUnits(EnemyBody.Position.Y));
-
+            PowerBeamPosition = new Vector2(ConvertUnits.ToDisplayUnits(PowerBeamBody.Position.X),
+                ConvertUnits.ToDisplayUnits(PowerBeamBody.Position.Y));
             walkwayPosition = new Vector2(ConvertUnits.ToDisplayUnits(walkwayBody.Position.X),
                 ConvertUnits.ToDisplayUnits(walkwayBody.Position.Y));
 
@@ -282,12 +266,26 @@ namespace cs567_assn5
              null,
              screenMatrix);
 
+
             spriteBatch.Draw(backGround, new Vector2(cameraPosition.X, 0),
                 new Rectangle((int)Math.Round(cameraPosition.X * layer0Scroll / backGroundScale1),
                     0, Window.ClientBounds.Width, Window.ClientBounds.Height), Color.White, 0.0f, Vector2.Zero, backGroundScale1,
                     SpriteEffects.None, 0);
 
+
+
             //first layer
+
+
+    //        spriteBatch.Draw(walkway, new Vector2(cameraPosition.X, 250),
+    //new Rectangle((int)Math.Round(cameraPosition.X * layer2Scroll / backGroundScale),
+    //    0, 800, 130), Color.White, 0.0f, Vector2.Zero, backGroundScale,
+    //    SpriteEffects.None, 0);
+
+
+            //spriteBatch.Draw(walkway, new Vector2(cameraPosition.X, 350),
+            //    walkwayRectangle, Color.White, 0.0f, Vector2.Zero, backGroundScale,
+            //        SpriteEffects.None, 0);
 
             spriteBatch.Draw(walkway, walkwayPosition, walkwayRectangle, Color.White,
                 walkwayBody.Rotation, new Vector2(walkwayRectangle.Width / 2f, walkwayRectangle.Height / 2f),
@@ -299,6 +297,7 @@ namespace cs567_assn5
             if (shoot == true)
             {
                 spriteBatch.Draw(powerBeam, PowerBeamPosition, PowerBeamRectangle, Color.White, PowerBeamBody.Rotation, new Vector2(PowerBeamRectangle.Width / 2f, PowerBeamRectangle.Height / 2f), PowerBeamScale, SpriteEffects.None, 0f);
+                shoot = false;
             }
 
             // TODO: Add your drawing code here
@@ -311,10 +310,12 @@ namespace cs567_assn5
             soundBank.PlayCue(cueName);
         }
 
+
+
         public bool OnCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)
         {
             if (!((fixtureA.Body.UserData is Type) &&
-                (fixtureB.Body.UserData is Type)))
+                (fixtureB.Body.UserData is Type))) 
                 return true;
             Type colliderType = (Type)(fixtureA.Body.UserData);
             Type collidedType = (Type)(fixtureB.Body.UserData);
@@ -322,28 +323,15 @@ namespace cs567_assn5
                 switch (collidedType)
                 {
                     case Type.walkway:
-                        return true;
-
+                            return true;
                     case Type.Enemy:
-                        return false;
-
+                            return false;
                     default:
                         return true;
                 }
-            //return true;
+                return true;
 
-            if (colliderType == Type.Enemy)
-                switch (collidedType)
-                {
-                    case Type.PowerBeam:
-                        shoot = false;
-                        EnemyBody.ApplyForce(new Vector2(15.0f, 0f));
-
-                        return false;
-                }
             return true;
         }
-
-
     }
 }
