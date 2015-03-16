@@ -14,6 +14,7 @@ namespace cs567_midterm
         private MouseState prevMouseState;
         private float time;
         private float delay;
+        public const float MaxMovement = 5.0f;
 
         public override Vector2 Direction
         {
@@ -22,7 +23,11 @@ namespace cs567_midterm
                 Vector2 inputDirection = Vector2.Zero;
 
                 if (Keyboard.GetState().IsKeyDown(Keys.Left))
+                {
+                    
                     inputDirection.X -= 1;
+                }
+
                 if (Keyboard.GetState().IsKeyDown(Keys.Right))
                     inputDirection.X += 1;
                 if (Keyboard.GetState().IsKeyDown(Keys.Up))
@@ -35,17 +40,17 @@ namespace cs567_midterm
         }
 
         public UserControlledSprite(Texture2D textureImage, Vector2 position,
-            Point frameSize, int collisionOffset, Point currentFrame, Point sheetSize,
+            Point frameSize, int collisionOffset, Point currentFramePosition, Point currentFrame, Point sheetSize,
             Vector2 speed, string cueName, int numFrames, int frame)
-            : base(textureImage, position, frameSize, collisionOffset, currentFrame,
+            : base(textureImage, position, frameSize, collisionOffset, currentFramePosition, currentFrame,
                 sheetSize, speed, cueName, numFrames, frame)
         {
         }
 
         public UserControlledSprite(Texture2D textureImage, Vector2 position,
-            Point frameSize, int collisionOffset, Point currentFrame, Point sheetSize,
+            Point frameSize, int collisionOffset, Point currentFramePosition, Point currentFrame, Point sheetSize,
             Vector2 speed, string cueName, int millisecondsPerFrame, int numFrames, int frame)
-            : base(textureImage, position, frameSize, collisionOffset, currentFrame,
+            : base(textureImage, position, frameSize, collisionOffset, currentFramePosition, currentFrame,
             sheetSize, speed, millisecondsPerFrame, cueName, numFrames, frame)
         {
         }
@@ -54,20 +59,11 @@ namespace cs567_midterm
         {
             position += Direction;
 
-            MouseState currMouseState = Mouse.GetState();
-            if (currMouseState.X != prevMouseState.X || currMouseState.Y != prevMouseState.Y)
-            {
-                delay = .25f;
-                time += (float)gameTime.ElapsedGameTime.TotalSeconds;
-                if (time > delay)
-                {
-                    soundEffect.Play();
-                    time = 0f;
-                }
 
-                position = new Vector2(currMouseState.X, currMouseState.Y);
-            }
-            prevMouseState = currMouseState;
+
+
+
+
 
             if (position.X < 0)
                 position.X = 0;

@@ -12,8 +12,9 @@ namespace cs567_midterm
     {
         //Sprite Draw
         private Texture2D textureImage;
-
+        
         protected Point frameSize;
+        private Point currentFramePosition;
         private Point currentFrame;
         private Point sheetSize;
         private int numFrames;
@@ -42,23 +43,29 @@ namespace cs567_midterm
         //Collision Cue Name
         public string cueName { get; set; }
 
+
+
+
+
         //Constructors
         public Sprite(Texture2D textureImage, Vector2 position, Point frameSize,
-            int collisionOffset, Point currentFrame, Point sheetSize, Vector2 speed,
+            int collisionOffset,Point currentFramePosition, Point currentFrame, Point sheetSize, Vector2 speed,
             string cueName, int numFrames, int frame)
-            : this(textureImage, position, frameSize, collisionOffset, currentFrame,
+            : this(textureImage, position, frameSize, collisionOffset,currentFramePosition, currentFrame,
             sheetSize, speed, defaultMillisecondsPerFrame, cueName, numFrames, frame)
         {
         }
 
         public Sprite(Texture2D textureImage, Vector2 position, Point frameSize,
-            int collisionOffset, Point currentFrame, Point sheetSize, Vector2 speed,
+            int collisionOffset, Point currentFramePosition, Point currentFrame, Point sheetSize, Vector2 speed,
             int millisecondsPerFrame, string cueName, int numFrames, int frame)
         {
             this.textureImage = textureImage;
             this.position = position;
             this.frameSize = frameSize;
             this.collisionOffset = collisionOffset;
+            this.currentFramePosition = currentFramePosition;
+            this.currentFrame = currentFrame;
             this.sheetSize = sheetSize;
             this.speed = speed;
             this.millisecondsPerFrame = millisecondsPerFrame;
@@ -69,8 +76,8 @@ namespace cs567_midterm
 
         public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(textureImage, position, new Rectangle(currentFrame.X * frameSize.X,
-                currentFrame.Y * frameSize.Y, frameSize.X, frameSize.Y), Color.White, 0, Vector2.Zero,
+            spriteBatch.Draw(textureImage, position, new Rectangle(currentFramePosition.X + currentFrame.X * frameSize.X,
+                currentFramePosition.Y + currentFrame.Y * frameSize.Y, frameSize.X, frameSize.Y), Color.White, 0, Vector2.Zero,
                 1f, SpriteEffects.None, 0);
         }
 

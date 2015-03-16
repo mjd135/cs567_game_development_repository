@@ -8,11 +8,11 @@ using System.Text;
 
 namespace cs567_midterm
 {
-    internal class ChasingSprite : Sprite
+    internal class PowerBeam : Sprite
     {
         private SpriteManager spriteManager;
 
-        public ChasingSprite(Texture2D textureImage, Vector2 position,
+        public PowerBeam(Texture2D textureImage, Vector2 position,
             Point frameSize, int collisionOffset, Point currentFramePosition, Point currentFrame,
             Point sheetSize, Vector2 speed, string cueName,
             SpriteManager spriteManager, int numFrames, int frame)
