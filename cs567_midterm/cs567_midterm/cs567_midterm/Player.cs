@@ -1,27 +1,38 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace cs567_midterm
 {
-    class Player
+    internal class Player
     {
-        Texture2D sprite;
-        Vector2 position;
-        Point spriteFirstFramePosition;
-        Point spriteCurrentFramePosition;
-        Point spriteFrameSize;
-        Point spriteSheetSize;
-        int spriteFrames;
-        int spriteCurrentFrame = 0;
-        float spriteScale;
+        private Texture2D sprite;
+        private Vector2 position;
+        private Point spriteFirstFramePosition;
+        private Point spriteCurrentFramePosition;
+        private Point spriteFrameSize;
+        private Point spriteSheetSize;
+        private Vector2 origin;
+        private Vector2 jumpHeight = new Vector2(0, 100);
+        private int spriteFrames;
+        private int spriteCurrentFrame = 0;
+        private float spriteScale;
         private int timeSinceLastFrame = 0;
         private int millisecondsPerFrame = 100;
-        
+        private State spriteCurrentState = State.Walking;
+        private Vector2 spriteStartingPosition = Vector2.Zero;
+        private KeyboardState previousKeyboardState;
+        private Vector2 spriteDirection = Vector2.Zero;
+        private const int MOVE_UP = -2;
+        private const int MOVE_DOWN = 2;
+        private Vector2 jumpSpeed = Vector2.Zero;
+        private const int spriteSpeed = 100;
+
+        private enum State
+        {
+            Walking,
+            Jumping
+        }
 
         public Player(Texture2D graphic, float x, float y, Point firstFrame, Point currentFrame, Point frameSize, Point sheetSize, int frames, float scale)
         {
@@ -33,6 +44,7 @@ namespace cs567_midterm
             spriteSheetSize = sheetSize;
             spriteFrames = frames;
             spriteScale = scale;
+            origin = position;
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -45,11 +57,17 @@ namespace cs567_midterm
 
         public void Update(GameTime gameTime, Vector2 cameraPosition)
         {
+            position += spriteDirection * jumpSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+
             KeyboardState keyboardState = Keyboard.GetState();
+
+            UpdateJump(keyboardState);
+
+            previousKeyboardState = keyboardState;
+
             position.X = cameraPosition.X + 100;
             if (keyboardState.IsKeyDown(Keys.Right))
             {
-                
                 timeSinceLastFrame += gameTime.ElapsedGameTime.Milliseconds;
                 if (timeSinceLastFrame > millisecondsPerFrame)
                 {
@@ -74,15 +92,52 @@ namespace cs567_midterm
                         }
                     }
                 }
-
             }
             if (keyboardState.IsKeyDown(Keys.Left))
             {
-              
             }
-
-            
         }
 
+        private void UpdateJump(KeyboardState keyboardState)
+        {
+            if (spriteCurrentState == State.Walking)
+            {
+                if (keyboardState.IsKeyDown(Keys.Space) == true && previousKeyboardState.IsKeyDown(Keys.Space) == false)
+                {
+                    Jump();
+                }
+            }
+
+            if (spriteCurrentState == State.Jumping)
+            {
+                if (position.Y < 50)
+                {
+                    spriteDirection.Y = MOVE_DOWN;
+                }
+
+                if (position.Y > origin.Y)
+                {
+                    position.Y = origin.Y;
+
+                    spriteCurrentState = State.Walking;
+
+                    spriteDirection = Vector2.Zero;
+                }
+            }
+        }
+
+        private void Jump()
+        {
+            if (spriteCurrentState != State.Jumping)
+            {
+                spriteCurrentState = State.Jumping;
+
+                origin = position;
+
+                spriteDirection.Y = MOVE_UP;
+
+                jumpSpeed = new Vector2(spriteSpeed, spriteSpeed);
+            }
+        }
     }
 }
