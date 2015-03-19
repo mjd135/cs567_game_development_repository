@@ -178,9 +178,9 @@ namespace cs567_midterm
 
             randomOffset = rand.Next(10, 250);
 
-            enemyTemp = new Enemy(pirateTexture, cameraPosition.X + 800, 200, new Point(447, 2), new Point(0, 0), new Point(46, 66), new Point(1, 8), 8, 2.5f);
+            enemyTemp = new Enemy(pirateTexture, cameraPosition.X + 800, 200, new Point(447, 2), new Point(0, 0), new Point(46, 66), new Point(8, 1), 8, 2.5f);
             enemies.Add(enemyTemp);
-            enemyTemp = new Enemy(metroidTexture, cameraPosition.X + 800, randomOffset, new Point(285, 4), new Point(0, 0), new Point(41, 47), new Point(1, 2), 2, 1.0f);
+            enemyTemp = new Enemy(metroidTexture, cameraPosition.X + 800, randomOffset, new Point(285, 4), new Point(0, 0), new Point(41, 47), new Point(2, 1), 2, 1.0f);
             enemies.Add(enemyTemp);
         }
 

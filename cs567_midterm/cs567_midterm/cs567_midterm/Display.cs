@@ -12,12 +12,7 @@ namespace cs567_midterm
         private float backGroundScroll = .25f;
         public Vector2 walkwayScale = new Vector2(1f, 1f);
         public Vector2 walkwayPosition = new Vector2(0, 300);
-
-        private int timeSinceLastFrame = 0;
-        private int millisecondsPerFrame = 100;
-
         private Game1 game;
-
         private SpriteFont score;
 
         public Display(Game1 _game)

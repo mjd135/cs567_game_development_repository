@@ -14,7 +14,8 @@ namespace cs567_midterm
         private int spriteFrames;
         private int spriteCurrentFrame = 0;
         private float spriteScale;
-
+        private int millisecondsPerFrame = 100;
+        float spriteTimeSinceLastFrame;
         private float updateCounter;
         private int updateRate;
         private int moveRate;
@@ -57,6 +58,31 @@ namespace cs567_midterm
                 return;
 
             updateCounter += 1000f / updateRate;
+
+             spriteTimeSinceLastFrame += elapsedTime;
+             if (spriteTimeSinceLastFrame > millisecondsPerFrame)
+             {
+                 spriteFrames++;
+                 spriteCurrentFramePosition.X++;
+                 spriteTimeSinceLastFrame = 0;
+                 if (spriteCurrentFrame >= spriteFrames)
+                 {
+                     spriteCurrentFramePosition.X = 0;
+                     spriteCurrentFramePosition.Y = 0;
+                     spriteCurrentFrame = 1;
+                 }
+                 else if (spriteCurrentFramePosition.X >= spriteSheetSize.X)
+                 {
+                     spriteCurrentFramePosition.X = 0;
+                     spriteCurrentFrame++;
+                     ++spriteCurrentFramePosition.Y;
+                     if (spriteCurrentFramePosition.Y >= spriteSheetSize.Y)
+                     {
+                         spriteCurrentFramePosition.Y = 0;
+                         spriteCurrentFrame = 0;
+                     }
+                 }
+             }
             position.X -= moveRate;
         }
     }
