@@ -15,6 +15,18 @@ namespace cs567_midterm
         private int spriteCurrentFrame = 0;
         private float spriteScale;
 
+        private float updateCounter;
+        private int updateRate;
+        private int moveRate;
+
+        public Vector2 Position
+        {
+            get
+            {
+                return position;
+            }
+        }
+
         public Enemy(Texture2D graphic, float x, float y, Point firstFrame, Point currentFrame, Point frameSize, Point sheetSize, int frames, float scale)
         {
             sprite = graphic;
@@ -25,6 +37,9 @@ namespace cs567_midterm
             spriteSheetSize = sheetSize;
             spriteFrames = frames;
             spriteScale = scale;
+            moveRate = 1;
+            updateCounter = 0;
+            updateRate = 60;
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -35,9 +50,14 @@ namespace cs567_midterm
                 Color.White, 0, Vector2.Zero, spriteScale, SpriteEffects.FlipHorizontally, 0f);
         }
 
-        public void Update()
+        public void Update(float elapsedTime)
         {
-            position.X--;
+            updateCounter -= elapsedTime;
+            if (updateCounter > 0)
+                return;
+
+            updateCounter += 1000f / updateRate;
+            position.X -= moveRate;
         }
     }
 }

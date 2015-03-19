@@ -23,8 +23,8 @@ namespace cs567_midterm
         private Vector2 spriteStartingPosition = Vector2.Zero;
         private KeyboardState previousKeyboardState;
         private Vector2 spriteDirection = Vector2.Zero;
-        private const int MOVE_UP = -2;
-        private const int MOVE_DOWN = 2;
+        private const int MOVE_UP = -1;
+        private const int MOVE_DOWN = 1;
         private Vector2 jumpSpeed = Vector2.Zero;
         private const int spriteSpeed = 100;
 

@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
-using System;
 
 namespace cs567_midterm
 {
@@ -23,17 +22,6 @@ namespace cs567_midterm
         private bool songStart = false;
 
         #endregion sound
-
-        #region background
-
-        private Texture2D backGround;
-        private Texture2D walkway;
-        private float backGroundScale = 2.5f;
-        private float backGroundScroll = .25f;
-        public Vector2 walkwayScale = new Vector2(1f, 1f);
-        public Vector2 walkwayPosition = new Vector2(0, 300);
-
-        #endregion background
 
         #region samus
 
@@ -57,12 +45,15 @@ namespace cs567_midterm
 
         #region framerate and camerea
 
-        private int timeSinceLastFrame = 0;
-        private int millisecondsPerFrame = 100;
+        //private int timeSinceLastFrame = 0;
+        //private int millisecondsPerFrame = 100;
         private Vector2 cameraPosition = Vector2.Zero;
+
         private const float cameraSpeed = 2.0f;
 
         #endregion framerate and camerea
+
+        private Display display;
 
         public Game1()
         {
@@ -81,9 +72,9 @@ namespace cs567_midterm
             // TODO: Add your initialization logic here
 
             base.Initialize();
-
-            spacePirate = new Enemy(pirateTexture, 300, 200, new Point(447, 2), new Point(0, 0), new Point(46, 66), new Point(1, 8), 8, 2.5f);
-            metroid = new Enemy(metroidTexture, 300, 100, new Point(285, 4), new Point(0, 0), new Point(41, 47), new Point(1, 2), 2, 1.0f);
+            display = new Display(this);
+            spacePirate = new Enemy(pirateTexture, 600, 200, new Point(447, 2), new Point(0, 0), new Point(46, 66), new Point(1, 8), 8, 2.5f);
+            metroid = new Enemy(metroidTexture, 600, 100, new Point(285, 4), new Point(0, 0), new Point(41, 47), new Point(1, 2), 2, 1.0f);
             player = new Player(samusTexture, 100, 220, new Point(240, 650), new Point(0, 0), new Point(48, 49), new Point(4, 3), 10, 3.0f);
         }
 
@@ -96,11 +87,11 @@ namespace cs567_midterm
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             themeSong = Content.Load<Song>(@"Audio\Theme");
-            backGround = Content.Load<Texture2D>(@"Images/Background");
-            walkway = Content.Load<Texture2D>(@"Images/bridge");
+
             samusTexture = Content.Load<Texture2D>(@"Images/samus");
             pirateTexture = Content.Load<Texture2D>(@"Images/space pirates");
             metroidTexture = Content.Load<Texture2D>(@"Images/metroids");
+
             MediaPlayer.IsRepeating = true;
 
             // TODO: use this.Content to load your game content here
@@ -128,8 +119,8 @@ namespace cs567_midterm
 
             // TODO: Add your update logic here
             player.Update(gameTime, cameraPosition);
-            spacePirate.Update();
-            metroid.Update();
+            spacePirate.Update((float)gameTime.ElapsedGameTime.TotalMilliseconds);
+            metroid.Update((float)gameTime.ElapsedGameTime.TotalMilliseconds);
 
             if (!songStart)
             {
@@ -179,20 +170,14 @@ namespace cs567_midterm
              null,
              screenMatrix);
 
-            spriteBatch.Draw(backGround, new Vector2(cameraPosition.X, 0),
-                new Rectangle((int)Math.Round(cameraPosition.X * backGroundScroll / backGroundScale),
-                    0, Window.ClientBounds.Width, Window.ClientBounds.Height), Color.White, 0.0f, Vector2.Zero, backGroundScale,
-                    SpriteEffects.None, 0);
-            spriteBatch.Draw(walkway, new Vector2(cameraPosition.X, walkwayPosition.Y / walkwayScale.Y),
-                new Rectangle((int)Math.Round(cameraPosition.X * 1.0 / backGroundScale),
-                    0, Window.ClientBounds.Width, Window.ClientBounds.Height), Color.White, 0.0f, Vector2.Zero, walkwayScale,
-                    SpriteEffects.None, 0);
+            display.DisplayBackGround(spriteBatch, cameraPosition);
 
             player.Draw(spriteBatch);
             spacePirate.Draw(spriteBatch);
             metroid.Draw(spriteBatch);
 
-            // TODO: Add your drawing code here
+            display.DisplayScore(spriteBatch, cameraPosition);
+
             spriteBatch.End();
             base.Draw(gameTime);
         }
