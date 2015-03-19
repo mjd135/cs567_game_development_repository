@@ -40,10 +40,10 @@ namespace cs567_midterm
                     SpriteEffects.None, 0);
         }
 
-        public void DisplayScore(SpriteBatch spriteBatch, Vector2 cameraPosition)
+        public void DisplayScore(SpriteBatch spriteBatch, Vector2 cameraPosition, int totalScore)
         {
             string playerScore;
-            playerScore = "Player Score:  ";
+            playerScore = "Player Score:  " + totalScore;
             spriteBatch.DrawString(score, playerScore, new Vector2(cameraPosition.X, 10), Color.White);
         }
     }

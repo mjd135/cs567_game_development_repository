@@ -19,6 +19,17 @@ namespace cs567_midterm
         private float updateCounter;
         private int updateRate;
         private int moveRate;
+        public bool isAlive;
+
+        public Rectangle Bounds
+        {
+            get
+            {
+                return new Rectangle((int)position.X +30, (int)position.Y, sprite.Width/5, sprite.Height/5);
+            }
+        }
+
+        
 
         public Vector2 Position
         {
@@ -41,6 +52,7 @@ namespace cs567_midterm
             moveRate = 1;
             updateCounter = 0;
             updateRate = 60;
+            isAlive = true;
         }
 
         public void Draw(SpriteBatch spriteBatch)

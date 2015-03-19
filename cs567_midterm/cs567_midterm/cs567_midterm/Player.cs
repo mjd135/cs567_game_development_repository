@@ -24,7 +24,7 @@ namespace cs567_midterm
         private KeyboardState previousKeyboardState;
         private Vector2 spriteDirection = Vector2.Zero;
         private const int MOVE_UP = -2;
-        private const int MOVE_DOWN = 2;
+        private const int MOVE_DOWN = 1;
         private Vector2 jumpSpeed = Vector2.Zero;
         private const int spriteSpeed = 100;
 
@@ -32,6 +32,14 @@ namespace cs567_midterm
         {
             Walking,
             Jumping
+        }
+
+        public Vector2 Position
+        {
+            get
+            {
+                return position;
+            }
         }
 
         public Player(Texture2D graphic, float x, float y, Point firstFrame, Point currentFrame, Point frameSize, Point sheetSize, int frames, float scale)
