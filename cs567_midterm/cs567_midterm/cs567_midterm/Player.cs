@@ -23,8 +23,8 @@ namespace cs567_midterm
         private Vector2 spriteStartingPosition = Vector2.Zero;
         private KeyboardState previousKeyboardState;
         private Vector2 spriteDirection = Vector2.Zero;
-        private const int MOVE_UP = -1;
-        private const int MOVE_DOWN = 1;
+        private const int MOVE_UP = -2;
+        private const int MOVE_DOWN = 2;
         private Vector2 jumpSpeed = Vector2.Zero;
         private const int spriteSpeed = 100;
 
@@ -110,7 +110,7 @@ namespace cs567_midterm
 
             if (spriteCurrentState == State.Jumping)
             {
-                if (position.Y < 50)
+                if (position.Y < 10)
                 {
                     spriteDirection.Y = MOVE_DOWN;
                 }

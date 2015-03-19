@@ -3,6 +3,8 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using System;
+using System.Collections.Generic;
 
 namespace cs567_midterm
 {
@@ -32,10 +34,11 @@ namespace cs567_midterm
 
         #region enemy
 
-        private Enemy spacePirate;
-        private Enemy metroid;
+        private List<Enemy> enemies;
         private Texture2D pirateTexture;
         private Texture2D metroidTexture;
+        private float enemyGenerationCounter;
+        private float enemyGenerationRate;
 
         #endregion enemy
 
@@ -45,15 +48,13 @@ namespace cs567_midterm
 
         #region framerate and camerea
 
-        //private int timeSinceLastFrame = 0;
-        //private int millisecondsPerFrame = 100;
         private Vector2 cameraPosition = Vector2.Zero;
-
         private const float cameraSpeed = 2.0f;
 
         #endregion framerate and camerea
 
         private Display display;
+        private Random rand;
 
         public Game1()
         {
@@ -73,8 +74,11 @@ namespace cs567_midterm
 
             base.Initialize();
             display = new Display(this);
-            spacePirate = new Enemy(pirateTexture, 600, 200, new Point(447, 2), new Point(0, 0), new Point(46, 66), new Point(1, 8), 8, 2.5f);
-            metroid = new Enemy(metroidTexture, 600, 100, new Point(285, 4), new Point(0, 0), new Point(41, 47), new Point(1, 2), 2, 1.0f);
+
+            enemyGenerationRate = .5f;
+            rand = new Random();
+            enemies = new List<Enemy>();
+
             player = new Player(samusTexture, 100, 220, new Point(240, 650), new Point(0, 0), new Point(48, 49), new Point(4, 3), 10, 3.0f);
         }
 
@@ -113,14 +117,13 @@ namespace cs567_midterm
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            HandleEnemies((float)gameTime.ElapsedGameTime.TotalMilliseconds);
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
             // TODO: Add your update logic here
             player.Update(gameTime, cameraPosition);
-            spacePirate.Update((float)gameTime.ElapsedGameTime.TotalMilliseconds);
-            metroid.Update((float)gameTime.ElapsedGameTime.TotalMilliseconds);
 
             if (!songStart)
             {
@@ -135,11 +138,9 @@ namespace cs567_midterm
                 player.Update(gameTime, cameraPosition);
             }
 
-            //KeyboardState keyboardState = Keyboard.GetState();
             if (keyboardState.IsKeyDown(Keys.Left))
             {
                 player.Update(gameTime, cameraPosition);
-
                 cameraPosition.X -= cameraSpeed;
             }
 
@@ -147,10 +148,49 @@ namespace cs567_midterm
                 cameraPosition.X += cameraSpeed;
             if (keyboardState.IsKeyDown(Keys.Space))
                 player.Update(gameTime, cameraPosition);
-            //if (keyboardState.IsKeyDown(Keys.Down))
-            //cameraPosition.Y += cameraSpeed;
 
             base.Update(gameTime);
+        }
+
+        private void HandleEnemies(float elapsedTime)
+        {
+            foreach (Enemy currentEnemy in enemies)
+            {
+                currentEnemy.Update(elapsedTime);
+            }
+
+            CheckForEnemiesOffScreen();
+
+            enemyGenerationCounter -= elapsedTime;
+
+            if (enemyGenerationCounter > 0)
+                return;
+
+            enemyGenerationCounter += 1000f / enemyGenerationRate;
+
+            CreateNewEnemy();
+        }
+
+        private void CreateNewEnemy()
+        {
+            Enemy enemyTemp;
+            int randomOffset;
+
+            randomOffset = rand.Next(10, 250);
+
+            enemyTemp = new Enemy(pirateTexture, cameraPosition.X + 800, 200, new Point(447, 2), new Point(0, 0), new Point(46, 66), new Point(1, 8), 8, 2.5f);
+            enemies.Add(enemyTemp);
+            enemyTemp = new Enemy(metroidTexture, cameraPosition.X + 800, randomOffset, new Point(285, 4), new Point(0, 0), new Point(41, 47), new Point(1, 2), 2, 1.0f);
+            enemies.Add(enemyTemp);
+        }
+
+        private void CheckForEnemiesOffScreen()
+        {
+            for (int i = enemies.Count - 1; i >= 0; i--)
+            {
+                if (enemies[i].Position.X < cameraPosition.X - 70)
+                    enemies.RemoveAt(i);
+            }
         }
 
         /// <summary>
@@ -173,8 +213,11 @@ namespace cs567_midterm
             display.DisplayBackGround(spriteBatch, cameraPosition);
 
             player.Draw(spriteBatch);
-            spacePirate.Draw(spriteBatch);
-            metroid.Draw(spriteBatch);
+
+            foreach (Enemy currentEnemy in enemies)
+            {
+                currentEnemy.Draw(spriteBatch);
+            }
 
             display.DisplayScore(spriteBatch, cameraPosition);
 
