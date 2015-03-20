@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -6,7 +7,6 @@ namespace cs567_midterm
 {
     internal class Player
     {
-
         private Texture2D sprite;
         private Vector2 position;
         private Point spriteFirstFramePosition;
@@ -64,7 +64,7 @@ namespace cs567_midterm
                 Color.White, 0, Vector2.Zero, spriteScale, SpriteEffects.None, 0f);
         }
 
-        public void Update(GameTime gameTime, Vector2 cameraPosition)
+        public void Update(GameTime gameTime, Vector2 cameraPosition, SoundEffect running)
         {
             position += spriteDirection * jumpSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -77,11 +77,10 @@ namespace cs567_midterm
             position.X = cameraPosition.X + 100;
             if (keyboardState.IsKeyDown(Keys.Right))
             {
-                
-               
                 timeSinceLastFrame += gameTime.ElapsedGameTime.Milliseconds;
                 if (timeSinceLastFrame > millisecondsPerFrame)
                 {
+                    running.Play();
                     spriteCurrentFrame++;
                     spriteCurrentFramePosition.X++;
                     timeSinceLastFrame = 0;

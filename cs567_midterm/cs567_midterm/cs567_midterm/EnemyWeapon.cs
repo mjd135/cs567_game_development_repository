@@ -1,9 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace cs567_midterm
 {
-    internal class Weapon
+    internal class EnemyWeapon
     {
         private Vector2 position;
         private Texture2D sprite;
@@ -29,13 +33,13 @@ namespace cs567_midterm
             }
         }
 
-        public Weapon(Texture2D graphic, float x, float y)
+        public EnemyWeapon(Texture2D graphic, float x, float y)
         {
             position = new Vector2(x, y);
             sprite = graphic;
             updateCounter = 0;
             updateRate = 60;
-            moveRate = 20;
+            moveRate = 5;
             isAlive = true;
         }
 
@@ -52,7 +56,7 @@ namespace cs567_midterm
 
             updateCounter += 1000f / updateRate;
 
-            position.X += moveRate;
+            position.X -= moveRate ;
         }
     }
 }

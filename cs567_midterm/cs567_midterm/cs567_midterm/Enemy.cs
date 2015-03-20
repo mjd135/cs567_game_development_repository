@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace cs567_midterm
 {
     internal class Enemy
-    {
+    {        
         private Texture2D sprite;
         private Vector2 position;
         private Point spriteFirstFramePosition;
@@ -15,21 +15,20 @@ namespace cs567_midterm
         private int spriteCurrentFrame = 0;
         private float spriteScale;
         private int millisecondsPerFrame = 100;
-        float spriteTimeSinceLastFrame;
+        private float spriteTimeSinceLastFrame;
         private float updateCounter;
         private int updateRate;
         private int moveRate;
+        public int enemyType;
         public bool isAlive;
 
         public Rectangle Bounds
         {
             get
             {
-                return new Rectangle((int)position.X +30, (int)position.Y, sprite.Width/5, sprite.Height/5);
+                return new Rectangle((int)position.X + 20, (int)position.Y, spriteFrameSize.X, spriteFrameSize.Y);
             }
         }
-
-        
 
         public Vector2 Position
         {
@@ -39,7 +38,7 @@ namespace cs567_midterm
             }
         }
 
-        public Enemy(Texture2D graphic, float x, float y, Point firstFrame, Point currentFrame, Point frameSize, Point sheetSize, int frames, float scale)
+        public Enemy(Texture2D graphic, float x, float y, Point firstFrame, Point currentFrame, Point frameSize, Point sheetSize, int frames, float scale, int type)
         {
             sprite = graphic;
             position = new Vector2(x, y);
@@ -52,6 +51,7 @@ namespace cs567_midterm
             moveRate = 1;
             updateCounter = 0;
             updateRate = 60;
+            enemyType = type;
             isAlive = true;
         }
 
@@ -71,30 +71,30 @@ namespace cs567_midterm
 
             updateCounter += 1000f / updateRate;
 
-             spriteTimeSinceLastFrame += elapsedTime;
-             if (spriteTimeSinceLastFrame > millisecondsPerFrame)
-             {
-                 spriteFrames++;
-                 spriteCurrentFramePosition.X++;
-                 spriteTimeSinceLastFrame = 0;
-                 if (spriteCurrentFrame >= spriteFrames)
-                 {
-                     spriteCurrentFramePosition.X = 0;
-                     spriteCurrentFramePosition.Y = 0;
-                     spriteCurrentFrame = 1;
-                 }
-                 else if (spriteCurrentFramePosition.X >= spriteSheetSize.X)
-                 {
-                     spriteCurrentFramePosition.X = 0;
-                     spriteCurrentFrame++;
-                     ++spriteCurrentFramePosition.Y;
-                     if (spriteCurrentFramePosition.Y >= spriteSheetSize.Y)
-                     {
-                         spriteCurrentFramePosition.Y = 0;
-                         spriteCurrentFrame = 0;
-                     }
-                 }
-             }
+            spriteTimeSinceLastFrame += elapsedTime;
+            if (spriteTimeSinceLastFrame > millisecondsPerFrame)
+            {
+                spriteFrames++;
+                spriteCurrentFramePosition.X++;
+                spriteTimeSinceLastFrame = 0;
+                if (spriteCurrentFrame >= spriteFrames)
+                {
+                    spriteCurrentFramePosition.X = 0;
+                    spriteCurrentFramePosition.Y = 0;
+                    spriteCurrentFrame = 1;
+                }
+                else if (spriteCurrentFramePosition.X >= spriteSheetSize.X)
+                {
+                    spriteCurrentFramePosition.X = 0;
+                    spriteCurrentFrame++;
+                    ++spriteCurrentFramePosition.Y;
+                    if (spriteCurrentFramePosition.Y >= spriteSheetSize.Y)
+                    {
+                        spriteCurrentFramePosition.Y = 0;
+                        spriteCurrentFrame = 0;
+                    }
+                }
+            }
             position.X -= moveRate;
         }
     }
