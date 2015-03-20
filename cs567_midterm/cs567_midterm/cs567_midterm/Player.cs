@@ -6,6 +6,7 @@ namespace cs567_midterm
 {
     internal class Player
     {
+
         private Texture2D sprite;
         private Vector2 position;
         private Point spriteFirstFramePosition;
@@ -76,6 +77,8 @@ namespace cs567_midterm
             position.X = cameraPosition.X + 100;
             if (keyboardState.IsKeyDown(Keys.Right))
             {
+                
+               
                 timeSinceLastFrame += gameTime.ElapsedGameTime.Milliseconds;
                 if (timeSinceLastFrame > millisecondsPerFrame)
                 {

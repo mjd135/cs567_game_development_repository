@@ -13,18 +13,25 @@ namespace cs567_midterm
     /// </summary>
     public class Game1 : Microsoft.Xna.Framework.Game
     {
+        #region game variables
+        private enum GameState { Menu, Playing, Paused, Dead };
         private Display display;
         private Random rand;
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
+        GameState currentState;
         public int totalScore;
+        SpriteFont titleFont;
+        KeyboardState previousKeyboardState;
+        KeyboardState currentKeyboardState;
+        #endregion
 
         #region sound
-        private AudioEngine audioEngine;
-        private WaveBank waveBank;
-        private SoundBank soundBank;
-        private SoundEffect soundEffect;
-        private Cue trackCue;
+        SoundEffect running;
+        SoundEffect playerShoot;
+        SoundEffect enemyDie;
+        SoundEffect enemyShoot;
+
         private Song themeSong;
         private bool songStart = false;
         #endregion sound
@@ -74,7 +81,7 @@ namespace cs567_midterm
 
             base.Initialize();
             display = new Display(this);
-
+            currentState = GameState.Menu;
             enemyGenerationRate = .5f;
             rand = new Random();
             enemies = new List<Enemy>();
@@ -98,8 +105,11 @@ namespace cs567_midterm
             powerBeam = Content.Load<Texture2D>(@"Images/powerBeam");
             pirateTexture = Content.Load<Texture2D>(@"Images/space pirates");
             metroidTexture = Content.Load<Texture2D>(@"Images/metroids");
-
-
+            titleFont = Content.Load<SpriteFont>(@"MenuPausedDead");
+            running = Content.Load<SoundEffect>(@"Audio/Running");
+            playerShoot = Content.Load<SoundEffect>(@"Audio/SuperMissile");
+            enemyDie = Content.Load<SoundEffect>(@"Audio/Boss5");
+            enemyShoot = Content.Load<SoundEffect>(@"Audio/Enemy6");
 
             MediaPlayer.IsRepeating = true;
 
@@ -122,6 +132,44 @@ namespace cs567_midterm
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            if (!songStart)
+            {
+                MediaPlayer.Play(themeSong);
+                songStart = true;
+            }
+
+            currentKeyboardState = Keyboard.GetState();
+
+
+            switch(currentState)
+            {
+                case GameState.Menu :
+                    Update_Menu(gameTime);
+                    break;
+                case GameState.Playing :
+                    Update_Playing(gameTime);
+                    break;
+                case GameState.Paused :
+                    Update_Paused(gameTime);
+                    break;
+                case GameState.Dead :
+                    Update_Dead(gameTime);
+                    break;
+            }
+
+            previousKeyboardState = currentKeyboardState;
+
+            base.Update(gameTime);
+        }
+
+        private void Update_Playing(GameTime gameTime)
+        {
+            if (CheckForPlayerCollision() == true)
+            {
+                currentState = GameState.Dead;
+                return;
+            }
+
             HandleEnemies((float)gameTime.ElapsedGameTime.TotalMilliseconds);
             HandlePowerBeam((float)gameTime.ElapsedGameTime.TotalMilliseconds);
 
@@ -135,15 +183,15 @@ namespace cs567_midterm
             // TODO: Add your update logic here
             player.Update(gameTime, cameraPosition);
 
-            if (!songStart)
-            {
-                MediaPlayer.Play(themeSong);
-                songStart = true;
-            }
+
 
             KeyboardState keyboardState = Keyboard.GetState();
+            if (currentKeyboardState.IsKeyDown(Keys.Enter) && !previousKeyboardState.IsKeyDown(Keys.Enter))
+                currentState = GameState.Paused;
+
             if (keyboardState.IsKeyDown(Keys.Right))
             {
+                running.Play();
                 cameraPosition.X += cameraSpeed;
                 player.Update(gameTime, cameraPosition);
             }
@@ -159,13 +207,60 @@ namespace cs567_midterm
             if (keyboardState.IsKeyDown(Keys.Space))
                 player.Update(gameTime, cameraPosition);
 
-            if(keyboardState.IsKeyDown(Keys.F) && (fireCounter <= 0))
+            if (keyboardState.IsKeyDown(Keys.F) && (fireCounter <= 0))
             {
                 FirePowerBeam();
-                fireCounter = 1000f /FIRE_RATE;
+                fireCounter = 1000f / FIRE_RATE;
+            }
+        }
+
+        private void Update_Menu(GameTime gameTime)
+        {
+            if (currentKeyboardState.IsKeyDown(Keys.Escape) && !previousKeyboardState.IsKeyDown(Keys.Escape))
+                this.Exit();
+
+            if (currentKeyboardState.IsKeyDown(Keys.Enter) && !previousKeyboardState.IsKeyDown(Keys.Enter))
+            {
+                currentState = GameState.Playing;
+                ResetGame();
+            }
+        }
+
+        private void ResetGame()
+        {
+            enemies.Clear();
+            powerBeamWeapon.Clear();
+            totalScore = 0;
+        }
+
+        private void Update_Dead(GameTime gameTime)
+        {
+
+            if (currentKeyboardState.IsKeyDown(Keys.Enter) && !previousKeyboardState.IsKeyDown(Keys.Enter))
+                currentState = GameState.Menu;
+        }
+
+        private void Update_Paused(GameTime gameTime)
+        {
+            if (currentKeyboardState.IsKeyDown(Keys.Escape) && !previousKeyboardState.IsKeyDown(Keys.Escape))
+                currentState = GameState.Menu;
+
+            if (currentKeyboardState.IsKeyDown(Keys.Enter) && !previousKeyboardState.IsKeyDown(Keys.Enter))
+                currentState = GameState.Playing;
+        }
+
+        private bool CheckForPlayerCollision()
+        {
+            Rectangle playerBounds;
+            playerBounds = new Rectangle((int)player.Position.X, (int)player.Position.Y, 48*2, 49);
+
+            foreach(Enemy e in enemies)
+            {
+                if (e.Bounds.Intersects(playerBounds))
+                    return true;
             }
 
-            base.Update(gameTime);
+            return false;
         }
 
         private void CheckForCollisions()
@@ -184,7 +279,9 @@ namespace cs567_midterm
                     {
                         e.isAlive = false;
                         w.isAlive = false;
+                        enemyDie.Play();
                         totalScore++;
+                        break;
                     }
                 }
             }
@@ -228,6 +325,7 @@ namespace cs567_midterm
             Weapon newPowerBeam;
             newPowerBeam = new Weapon(powerBeam, player.Position.X + 41*3, player.Position.Y + 15*3 - powerBeam.Height /2);
             powerBeamWeapon.Add(newPowerBeam);
+            playerShoot.Play();
         }
 
         private void HandleEnemies(float elapsedTime)
@@ -288,6 +386,51 @@ namespace cs567_midterm
              null,
              screenMatrix);
 
+            switch(currentState)
+            {
+                case GameState.Playing :
+                    Draw_Playing(gameTime);
+                    break;
+                case GameState.Menu :
+                    Draw_Menu(gameTime);
+                    break;
+                case GameState.Dead :
+                    Draw_Dead(gameTime);
+                    break;
+                case GameState.Paused :
+                    Draw_Paused(gameTime);
+                    break;
+            }
+            spriteBatch.End();
+            base.Draw(gameTime);
+        }
+
+        private void Draw_Menu(GameTime gameTime)
+        {
+            display.DisplayBackGround(spriteBatch, cameraPosition);
+
+            spriteBatch.DrawString(titleFont, "My Metroid Shooter", new Vector2(cameraPosition.X + 100, 100), Color.White);
+            spriteBatch.DrawString(titleFont, "Press Enter to play", new Vector2(cameraPosition.X + 100, 150), Color.White);
+            spriteBatch.DrawString(titleFont, "Press ESC to quit", new Vector2(cameraPosition.X + 100, 200), Color.White);
+        }
+
+        private void Draw_Paused(GameTime gameTime)
+        {
+            Draw_Playing(gameTime);
+            spriteBatch.DrawString(titleFont, "Game is Paused", new Vector2(cameraPosition.X + 100, 50), Color.White);
+            spriteBatch.DrawString(titleFont, "Press Enter to Unpause", new Vector2(cameraPosition.X + 100, 100), Color.White);
+            spriteBatch.DrawString(titleFont, "Press ESC for the menu", new Vector2(cameraPosition.X + 100, 150), Color.White);
+        }
+
+        private void Draw_Dead(GameTime gameTime)
+        {
+            display.DisplayBackGround(spriteBatch, cameraPosition);
+            spriteBatch.DrawString(titleFont, "You Were Defeated!", new Vector2(cameraPosition.X + 100, 100), Color.White);
+            spriteBatch.DrawString(titleFont, "Press Enter for the menu", new Vector2(cameraPosition.X + 100, 150), Color.White);
+        }
+
+        private void Draw_Playing(GameTime gameTime)
+        {
             display.DisplayBackGround(spriteBatch, cameraPosition);
 
             player.Draw(spriteBatch);
@@ -303,14 +446,8 @@ namespace cs567_midterm
             }
 
             display.DisplayScore(spriteBatch, cameraPosition, totalScore);
-
-            spriteBatch.End();
-            base.Draw(gameTime);
         }
 
-        public void PlayCue(string cueName)
-        {
-            soundBank.PlayCue(cueName);
-        }
+
     }
 }
