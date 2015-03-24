@@ -66,12 +66,12 @@ namespace cs567_midterm
 
         #endregion enemy
 
+        private Boss boss;
         private Texture2D enemyWeaponTexture;
+        private Texture2D bossTexture;
         private List<EnemyWeapon> enemyWeapon;
         private float enemyFireCounter;
         private const float ENEMY_FIRE_RATE = .5f;
-
-
 
         #region framerate and camerea
 
@@ -104,7 +104,7 @@ namespace cs567_midterm
             enemies = new List<Enemy>();
 
             player = new Player(samusTexture, 100, 220, new Point(240, 650), new Point(0, 0), new Point(48, 49), new Point(4, 3), 10, 3.0f);
-
+            boss = new Boss(bossTexture, 500, 150, new Point(0, 0), new Point(6, 0), new Point(104, 106), new Point(6, 1), 6, 2f);
             powerBeamWeapon = new List<Weapon>();
             enemyWeapon = new List<EnemyWeapon>();
             enemyFireCounter = 0;
@@ -130,6 +130,7 @@ namespace cs567_midterm
             enemyDie = Content.Load<SoundEffect>(@"Audio/Boss5");
             enemyShoot = Content.Load<SoundEffect>(@"Audio/Enemy6");
             enemyWeaponTexture = Content.Load<Texture2D>(@"Images/enemyWeapon");
+            bossTexture = Content.Load<Texture2D>(@"Images/SA-X");
             MediaPlayer.IsRepeating = true;
 
             // TODO: use this.Content to load your game content here
@@ -190,7 +191,7 @@ namespace cs567_midterm
                 currentState = GameState.Dead;
                 return;
             }
-
+            boss.Update((float)gameTime.ElapsedGameTime.TotalMilliseconds);
             HandleEnemies((float)gameTime.ElapsedGameTime.TotalMilliseconds);
             HandlePowerBeam((float)gameTime.ElapsedGameTime.TotalMilliseconds);
             HandleEnemyWeapon((float)gameTime.ElapsedGameTime.TotalMilliseconds);
@@ -210,7 +211,7 @@ namespace cs567_midterm
 
             if (keyboardState.IsKeyDown(Keys.Right))
             {
-                //running.Play();
+                
                 cameraPosition.X += cameraSpeed;
                 player.Update(gameTime, cameraPosition, running);
             }
@@ -220,9 +221,7 @@ namespace cs567_midterm
                 player.Update(gameTime, cameraPosition, running);
                 cameraPosition.X -= cameraSpeed;
             }
-
-            if (keyboardState.IsKeyDown(Keys.Right))
-                cameraPosition.X += cameraSpeed;
+            
             if (keyboardState.IsKeyDown(Keys.Space))
                 player.Update(gameTime, cameraPosition, running);
 
@@ -234,10 +233,10 @@ namespace cs567_midterm
 
             foreach (Enemy e in enemies)
             {
-                if(enemyFireCounter <=0)
-                { 
-                FireEnemyWeapon();
-                enemyFireCounter = 1000f / ENEMY_FIRE_RATE;
+                if (enemyFireCounter <= 0)
+                {
+                    FireEnemyWeapon();
+                    enemyFireCounter = 1000f / ENEMY_FIRE_RATE;
                 }
             }
         }
@@ -246,7 +245,7 @@ namespace cs567_midterm
         {
             foreach (Enemy e in enemies)
             {
-                if (e.enemyType == 1 && e.Position.X - player.Position.X <= 500)
+                if (e.enemyType == 1 && e.Position.X - player.Position.X <= (700))
                 {
                     EnemyWeapon newEnemyWeapon;
                     newEnemyWeapon = new EnemyWeapon(enemyWeaponTexture, e.Position.X, e.Position.Y + 75 - enemyWeaponTexture.Height / 2);
@@ -323,7 +322,7 @@ namespace cs567_midterm
                     return true;
             }
 
-            foreach(EnemyWeapon ew in enemyWeapon)
+            foreach (EnemyWeapon ew in enemyWeapon)
             {
                 if (ew.Bounds.Intersects(playerBounds))
                     return true;
@@ -506,6 +505,7 @@ namespace cs567_midterm
             display.DisplayBackGround(spriteBatch, cameraPosition);
 
             player.Draw(spriteBatch);
+            boss.Draw(spriteBatch);
 
             foreach (Weapon w in powerBeamWeapon)
             {
