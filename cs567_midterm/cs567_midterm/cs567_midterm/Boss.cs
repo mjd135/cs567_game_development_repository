@@ -17,10 +17,11 @@ namespace cs567_midterm
         private int millisecondsPerFrame = 100;
         private float spriteTimeSinceLastFrame;
         private float updateCounter;
-        private int updateRate;
-        private int moveRate;
-        public int enemyType;
+        private int updateRate;        
+        public int bossLife;
         public bool isAlive;
+
+
 
         public Rectangle Bounds
         {
@@ -48,10 +49,10 @@ namespace cs567_midterm
             spriteSheetSize = sheetSize;
             spriteFrames = frames;
             spriteScale = scale;
-            moveRate = 1;
+            
             updateCounter = 0;
             updateRate = 60;
-            enemyType = 10;
+            bossLife = 30;
             isAlive = true;
         }
 
@@ -95,7 +96,7 @@ namespace cs567_midterm
                     }
                 }
             }
-            position.X -= moveRate;
+            
         }
     }
 }

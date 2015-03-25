@@ -46,5 +46,12 @@ namespace cs567_midterm
             playerScore = "Player Score:  " + totalScore;
             spriteBatch.DrawString(score, playerScore, new Vector2(cameraPosition.X, 10), Color.White);
         }
+
+        public void DisplayBossLife(SpriteBatch spriteBatch, Vector2 cameraPosition, int life)
+        {
+            string bossLife;
+            bossLife = "Bosses life:  " + life;
+            spriteBatch.DrawString(score, bossLife, new Vector2(cameraPosition.X, 20), Color.White);
+        }
     }
 }

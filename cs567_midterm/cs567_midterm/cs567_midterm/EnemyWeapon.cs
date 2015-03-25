@@ -33,13 +33,13 @@ namespace cs567_midterm
             }
         }
 
-        public EnemyWeapon(Texture2D graphic, float x, float y)
+        public EnemyWeapon(Texture2D graphic, float x, float y, int moveRate)
         {
             position = new Vector2(x, y);
             sprite = graphic;
             updateCounter = 0;
             updateRate = 60;
-            moveRate = 5;
+            this.moveRate = moveRate;
             isAlive = true;
         }
 

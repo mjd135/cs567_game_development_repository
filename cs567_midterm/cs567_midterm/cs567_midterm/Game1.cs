@@ -15,13 +15,15 @@ namespace cs567_midterm
     {
         #region game variables
 
-        private enum GameState { Menu, Playing, Paused, Dead };
+        private enum GameState { Menu, Playing, Paused, Dead, Boss };
 
+        private float currentPos;
         private Display display;
         private Random rand;
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         private GameState currentState;
+        private int enemiesDefeated;
         public int totalScore;
         private SpriteFont titleFont;
         private KeyboardState previousKeyboardState;
@@ -57,21 +59,23 @@ namespace cs567_midterm
         #endregion powerBeam
 
         #region enemy
-
+        private Boss boss;
+        private int bossLife;
         private List<Enemy> enemies;
+        private List<Boss> bosses;
         private Texture2D pirateTexture;
         private Texture2D metroidTexture;
         private float enemyGenerationCounter;
         private float enemyGenerationRate;
-
+        private Texture2D bossTexture;
         #endregion enemy
 
-        private Boss boss;
-        private Texture2D enemyWeaponTexture;
-        private Texture2D bossTexture;
+        
+        private Texture2D enemyWeaponTexture;        
         private List<EnemyWeapon> enemyWeapon;
         private float enemyFireCounter;
-        private const float ENEMY_FIRE_RATE = .5f;
+        private const float ENEMY_FIRE_RATE = .5f;        
+        
 
         #region framerate and camerea
 
@@ -102,11 +106,10 @@ namespace cs567_midterm
             enemyGenerationRate = .5f;
             rand = new Random();
             enemies = new List<Enemy>();
-
-            player = new Player(samusTexture, 100, 220, new Point(240, 650), new Point(0, 0), new Point(48, 49), new Point(4, 3), 10, 3.0f);
-            boss = new Boss(bossTexture, 500, 150, new Point(0, 0), new Point(6, 0), new Point(104, 106), new Point(6, 1), 6, 2f);
+            player = new Player(samusTexture, 100, 220, new Point(240, 650), new Point(0, 0), new Point(48, 49), new Point(4, 3), 10, 3.0f);            
             powerBeamWeapon = new List<Weapon>();
             enemyWeapon = new List<EnemyWeapon>();
+            bosses = new List<Boss>();
             enemyFireCounter = 0;
             fireCounter = 0;
         }
@@ -152,10 +155,17 @@ namespace cs567_midterm
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            currentPos = player.Position.X;
             if (!songStart)
             {
                 MediaPlayer.Play(themeSong);
                 songStart = true;
+            }
+
+            if (enemiesDefeated == 1)
+            {
+                enemiesDefeated = 0;
+                currentState = GameState.Boss;
             }
 
             currentKeyboardState = Keyboard.GetState();
@@ -177,6 +187,10 @@ namespace cs567_midterm
                 case GameState.Dead:
                     Update_Dead(gameTime);
                     break;
+
+                case GameState.Boss:
+                    Update_Boss(gameTime);
+                    break;
             }
 
             previousKeyboardState = currentKeyboardState;
@@ -184,14 +198,78 @@ namespace cs567_midterm
             base.Update(gameTime);
         }
 
+        private void Update_Boss(GameTime gameTime)
+        {
+            
+            if (CheckForPlayerCollision() == true)
+            {
+                currentState = GameState.Dead;
+                return;
+            }
+
+            for (int i = enemies.Count - 1; i >= 0; i--)
+            {
+                enemies.RemoveAt(i);               
+            }
+
+            HandleBoss((float)gameTime.ElapsedGameTime.TotalMilliseconds);
+            
+            HandlePowerBeam((float)gameTime.ElapsedGameTime.TotalMilliseconds);
+            HandleEnemyWeapon((float)gameTime.ElapsedGameTime.TotalMilliseconds);
+            fireCounter -= ((float)gameTime.ElapsedGameTime.TotalMilliseconds);
+            enemyFireCounter -= ((float)gameTime.ElapsedGameTime.TotalMilliseconds);
+            CheckForCollisions();
+            // Allows the game to exit
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+                this.Exit();
+
+            // TODO: Add your update logic here
+            player.Update(gameTime, cameraPosition, running);
+
+            KeyboardState keyboardState = Keyboard.GetState();
+            if (currentKeyboardState.IsKeyDown(Keys.Enter) && !previousKeyboardState.IsKeyDown(Keys.Enter))
+                currentState = GameState.Paused;
+
+            if (keyboardState.IsKeyDown(Keys.Right))
+            {
+
+                cameraPosition.X += cameraSpeed;
+                player.Update(gameTime, cameraPosition, running);
+            }
+
+            if (keyboardState.IsKeyDown(Keys.Left))
+            {
+                player.Update(gameTime, cameraPosition, running);
+                cameraPosition.X -= cameraSpeed;
+            }
+
+            if (keyboardState.IsKeyDown(Keys.Space))
+                player.Update(gameTime, cameraPosition, running);
+
+            if (keyboardState.IsKeyDown(Keys.F) && (fireCounter <= 0))
+            {
+                FirePowerBeam();
+                fireCounter = 1000f / FIRE_RATE;
+            }
+
+            foreach (Boss b in bosses)
+            {
+                if (enemyFireCounter <= 0)
+                {
+                    FireBossWeapon();
+                    enemyFireCounter = 1000f / ENEMY_FIRE_RATE;
+                }
+            }
+        }
+
+
         private void Update_Playing(GameTime gameTime)
         {
             if (CheckForPlayerCollision() == true)
             {
                 currentState = GameState.Dead;
                 return;
-            }
-            boss.Update((float)gameTime.ElapsedGameTime.TotalMilliseconds);
+            }            
             HandleEnemies((float)gameTime.ElapsedGameTime.TotalMilliseconds);
             HandlePowerBeam((float)gameTime.ElapsedGameTime.TotalMilliseconds);
             HandleEnemyWeapon((float)gameTime.ElapsedGameTime.TotalMilliseconds);
@@ -241,14 +319,39 @@ namespace cs567_midterm
             }
         }
 
+
+        private void FireBossWeapon()
+        {
+            foreach (Boss b in bosses)
+            {
+
+                    EnemyWeapon newEnemyWeapon;
+                    newEnemyWeapon = new EnemyWeapon(enemyWeaponTexture, b.Position.X-10, b.Position.Y + 120 - enemyWeaponTexture.Height / 2, 10);
+                    enemyWeapon.Add(newEnemyWeapon);
+                    enemyShoot.Play();
+                
+            }
+        }
+
+        private void HandleBossWeapon(float elapsedTime)
+        {
+            foreach (EnemyWeapon w in enemyWeapon)
+            {
+                w.Update(elapsedTime);
+            }
+
+            CheckForEnemyWeaponOffScreen();
+        }
+
+
         private void FireEnemyWeapon()
         {
             foreach (Enemy e in enemies)
             {
-                if (e.enemyType == 1 && e.Position.X - player.Position.X <= (700))
+                if (e.enemyType == 1 && e.Position.X - player.Position.X <= (650))
                 {
                     EnemyWeapon newEnemyWeapon;
-                    newEnemyWeapon = new EnemyWeapon(enemyWeaponTexture, e.Position.X, e.Position.Y + 75 - enemyWeaponTexture.Height / 2);
+                    newEnemyWeapon = new EnemyWeapon(enemyWeaponTexture, e.Position.X, e.Position.Y + 75 - enemyWeaponTexture.Height / 2, 5);
                     enemyWeapon.Add(newEnemyWeapon);
                     enemyShoot.Play();
                 }
@@ -293,6 +396,7 @@ namespace cs567_midterm
             enemies.Clear();
             powerBeamWeapon.Clear();
             enemyWeapon.Clear();
+            bosses.Clear();
             totalScore = 0;
         }
 
@@ -335,6 +439,7 @@ namespace cs567_midterm
         {
             Rectangle powerBeamRectangle;
             Rectangle enemyRectangle;
+            Rectangle bossRectangle;
 
             foreach (Weapon w in powerBeamWeapon)
             {
@@ -348,8 +453,25 @@ namespace cs567_midterm
                         e.isAlive = false;
                         w.isAlive = false;
                         enemyDie.Play();
+                        enemiesDefeated++;
                         totalScore++;
                         break;
+                    }
+                }
+
+                foreach (Boss b in bosses)
+                {
+                    bossRectangle = b.Bounds;
+                    if( bossRectangle.Intersects(powerBeamRectangle))
+                    {
+                        b.bossLife--;
+                        if (b.bossLife == 0)
+                        {
+                            b.isAlive = false;
+                            w.isAlive = false;
+                            totalScore = totalScore + 10;
+                            currentState = GameState.Playing;
+                        }
                     }
                 }
             }
@@ -364,6 +486,12 @@ namespace cs567_midterm
             {
                 if (enemies[e].isAlive == false)
                     enemies.RemoveAt(e);
+            }
+
+            for (int b = bosses.Count - 1; b >= 0; b--)
+            {
+                if (bosses[b].isAlive == false)
+                    bosses.RemoveAt(b);
             }
         }
 
@@ -428,6 +556,28 @@ namespace cs567_midterm
             enemies.Add(enemyTemp);
         }
 
+        private void HandleBoss(float elapsedTime)
+        {
+            foreach (Boss currentBoss in bosses)
+            {
+                currentBoss.Update(elapsedTime);
+            }
+
+            if (bosses.Count < 1)
+                CreateNewBoss();
+
+        }
+
+        private void CreateNewBoss()
+        {
+            Boss bossTemp;
+
+            bossTemp = new Boss(bossTexture, currentPos + 500, 150, new Point(0, 0), new Point(6, 0), new Point(104, 106), new Point(6, 1), 6, 2f);
+
+            
+            bosses.Add(bossTemp);
+        }
+
         private void CheckForEnemiesOffScreen()
         {
             for (int i = enemies.Count - 1; i >= 0; i--)
@@ -471,6 +621,9 @@ namespace cs567_midterm
                 case GameState.Paused:
                     Draw_Paused(gameTime);
                     break;
+                case GameState.Boss:
+                    Draw_Boss(gameTime);
+                    break;
             }
             spriteBatch.End();
             base.Draw(gameTime);
@@ -504,8 +657,8 @@ namespace cs567_midterm
         {
             display.DisplayBackGround(spriteBatch, cameraPosition);
 
+            
             player.Draw(spriteBatch);
-            boss.Draw(spriteBatch);
 
             foreach (Weapon w in powerBeamWeapon)
             {
@@ -521,6 +674,30 @@ namespace cs567_midterm
             }
 
             display.DisplayScore(spriteBatch, cameraPosition, totalScore);
+        }
+
+        private void Draw_Boss(GameTime gametime)
+        {
+            display.DisplayBackGround(spriteBatch, cameraPosition);
+            
+            player.Draw(spriteBatch);
+
+            foreach (Boss b in bosses)
+            {
+                b.Draw(spriteBatch);
+                bossLife = b.bossLife;
+            }
+            foreach (EnemyWeapon ew in enemyWeapon)
+            {
+                ew.Draw(spriteBatch);
+            }
+            foreach (Weapon w in powerBeamWeapon)
+            {
+                w.Draw(spriteBatch);
+            }
+            
+
+            display.DisplayBossLife(spriteBatch, cameraPosition, bossLife);
         }
     }
 }
