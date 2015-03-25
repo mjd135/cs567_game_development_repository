@@ -19,7 +19,7 @@ namespace cs567_midterm
         private int spriteCurrentFrame = 0;
         private float spriteScale;
         private int timeSinceLastFrame = 0;
-        private int millisecondsPerFrame = 100;
+        private int millisecondsPerFrame = 150;
         private State spriteCurrentState = State.Walking;
         private Vector2 spriteStartingPosition = Vector2.Zero;
         private KeyboardState previousKeyboardState;
@@ -73,17 +73,17 @@ namespace cs567_midterm
             UpdateJump(keyboardState);
 
             previousKeyboardState = keyboardState;
-
+            timeSinceLastFrame += gameTime.ElapsedGameTime.Milliseconds;
             position.X = cameraPosition.X + 100;
             if (keyboardState.IsKeyDown(Keys.Right))
             {
-                timeSinceLastFrame += gameTime.ElapsedGameTime.Milliseconds;
                 if (timeSinceLastFrame > millisecondsPerFrame)
                 {
                     running.Play();
                     spriteCurrentFrame++;
                     spriteCurrentFramePosition.X++;
                     timeSinceLastFrame = 0;
+
                     if (spriteCurrentFrame >= spriteFrames)
                     {
                         spriteCurrentFramePosition.X = 0;
@@ -98,13 +98,38 @@ namespace cs567_midterm
                         if (spriteCurrentFramePosition.Y >= spriteSheetSize.Y)
                         {
                             spriteCurrentFramePosition.Y = 0;
-                            spriteCurrentFrame = 0;
+                            spriteCurrentFrame = 3;
                         }
                     }
                 }
             }
             if (keyboardState.IsKeyDown(Keys.Left))
             {
+                if (timeSinceLastFrame > millisecondsPerFrame)
+                {
+                    running.Play();
+                    spriteCurrentFrame++;
+                    spriteCurrentFramePosition.X++;
+                    timeSinceLastFrame = 0;
+
+                    if (spriteCurrentFrame >= spriteFrames)
+                    {
+                        spriteCurrentFramePosition.X = 0;
+                        spriteCurrentFramePosition.Y = 0;
+                        spriteCurrentFrame = 1;
+                    }
+                    else if (spriteCurrentFramePosition.X >= spriteSheetSize.X)
+                    {
+                        spriteCurrentFramePosition.X = 0;
+                        spriteCurrentFrame++;
+                        ++spriteCurrentFramePosition.Y;
+                        if (spriteCurrentFramePosition.Y >= spriteSheetSize.Y)
+                        {
+                            spriteCurrentFramePosition.Y = 0;
+                            spriteCurrentFrame = 3;
+                        }
+                    }
+                }
             }
         }
 

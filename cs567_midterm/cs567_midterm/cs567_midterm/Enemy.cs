@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace cs567_midterm
 {
     internal class Enemy
-    {        
+    {
         private Texture2D sprite;
         private Vector2 position;
         private Point spriteFirstFramePosition;

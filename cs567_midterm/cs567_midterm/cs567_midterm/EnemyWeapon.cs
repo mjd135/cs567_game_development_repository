@@ -1,9 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace cs567_midterm
 {
@@ -56,7 +52,7 @@ namespace cs567_midterm
 
             updateCounter += 1000f / updateRate;
 
-            position.X -= moveRate ;
+            position.X -= moveRate;
         }
     }
 }

@@ -59,6 +59,7 @@ namespace cs567_midterm
         #endregion powerBeam
 
         #region enemy
+
         private Boss boss;
         private int bossLife;
         private List<Enemy> enemies;
@@ -68,19 +69,22 @@ namespace cs567_midterm
         private float enemyGenerationCounter;
         private float enemyGenerationRate;
         private Texture2D bossTexture;
+
         #endregion enemy
 
-        
-        private Texture2D enemyWeaponTexture;        
+        #region enemy weapon
+
+        private Texture2D enemyWeaponTexture;
         private List<EnemyWeapon> enemyWeapon;
         private float enemyFireCounter;
-        private const float ENEMY_FIRE_RATE = .5f;        
-        
+        private const float ENEMY_FIRE_RATE = .5f;
+
+        #endregion enemy weapon
 
         #region framerate and camerea
 
         private Vector2 cameraPosition = Vector2.Zero;
-        private const float cameraSpeed = 2.0f;
+        private const float cameraSpeed = 3.5f;
 
         #endregion framerate and camerea
 
@@ -106,7 +110,7 @@ namespace cs567_midterm
             enemyGenerationRate = .5f;
             rand = new Random();
             enemies = new List<Enemy>();
-            player = new Player(samusTexture, 100, 220, new Point(240, 650), new Point(0, 0), new Point(48, 49), new Point(4, 3), 10, 3.0f);            
+            player = new Player(samusTexture, 100, 220, new Point(240, 650), new Point(0, 0), new Point(48, 49), new Point(4, 3), 10, 3.0f);
             powerBeamWeapon = new List<Weapon>();
             enemyWeapon = new List<EnemyWeapon>();
             bosses = new List<Boss>();
@@ -162,7 +166,7 @@ namespace cs567_midterm
                 songStart = true;
             }
 
-            if (enemiesDefeated == 1)
+            if (enemiesDefeated == 10)
             {
                 enemiesDefeated = 0;
                 currentState = GameState.Boss;
@@ -200,7 +204,6 @@ namespace cs567_midterm
 
         private void Update_Boss(GameTime gameTime)
         {
-            
             if (CheckForPlayerCollision() == true)
             {
                 currentState = GameState.Dead;
@@ -209,11 +212,11 @@ namespace cs567_midterm
 
             for (int i = enemies.Count - 1; i >= 0; i--)
             {
-                enemies.RemoveAt(i);               
+                enemies.RemoveAt(i);
             }
 
             HandleBoss((float)gameTime.ElapsedGameTime.TotalMilliseconds);
-            
+
             HandlePowerBeam((float)gameTime.ElapsedGameTime.TotalMilliseconds);
             HandleEnemyWeapon((float)gameTime.ElapsedGameTime.TotalMilliseconds);
             fireCounter -= ((float)gameTime.ElapsedGameTime.TotalMilliseconds);
@@ -232,7 +235,6 @@ namespace cs567_midterm
 
             if (keyboardState.IsKeyDown(Keys.Right))
             {
-
                 cameraPosition.X += cameraSpeed;
                 player.Update(gameTime, cameraPosition, running);
             }
@@ -262,14 +264,13 @@ namespace cs567_midterm
             }
         }
 
-
         private void Update_Playing(GameTime gameTime)
         {
             if (CheckForPlayerCollision() == true)
             {
                 currentState = GameState.Dead;
                 return;
-            }            
+            }
             HandleEnemies((float)gameTime.ElapsedGameTime.TotalMilliseconds);
             HandlePowerBeam((float)gameTime.ElapsedGameTime.TotalMilliseconds);
             HandleEnemyWeapon((float)gameTime.ElapsedGameTime.TotalMilliseconds);
@@ -289,7 +290,6 @@ namespace cs567_midterm
 
             if (keyboardState.IsKeyDown(Keys.Right))
             {
-                
                 cameraPosition.X += cameraSpeed;
                 player.Update(gameTime, cameraPosition, running);
             }
@@ -299,7 +299,7 @@ namespace cs567_midterm
                 player.Update(gameTime, cameraPosition, running);
                 cameraPosition.X -= cameraSpeed;
             }
-            
+
             if (keyboardState.IsKeyDown(Keys.Space))
                 player.Update(gameTime, cameraPosition, running);
 
@@ -319,17 +319,14 @@ namespace cs567_midterm
             }
         }
 
-
         private void FireBossWeapon()
         {
             foreach (Boss b in bosses)
             {
-
-                    EnemyWeapon newEnemyWeapon;
-                    newEnemyWeapon = new EnemyWeapon(enemyWeaponTexture, b.Position.X-10, b.Position.Y + 120 - enemyWeaponTexture.Height / 2, 10);
-                    enemyWeapon.Add(newEnemyWeapon);
-                    enemyShoot.Play();
-                
+                EnemyWeapon newEnemyWeapon;
+                newEnemyWeapon = new EnemyWeapon(enemyWeaponTexture, b.Position.X - 10, b.Position.Y + 120 - enemyWeaponTexture.Height / 2, 10);
+                enemyWeapon.Add(newEnemyWeapon);
+                enemyShoot.Play();
             }
         }
 
@@ -343,12 +340,11 @@ namespace cs567_midterm
             CheckForEnemyWeaponOffScreen();
         }
 
-
         private void FireEnemyWeapon()
         {
             foreach (Enemy e in enemies)
             {
-                if (e.enemyType == 1 && e.Position.X - player.Position.X <= (650))
+                if (e.enemyType == 1 && e.Position.X - cameraPosition.X <= (690))
                 {
                     EnemyWeapon newEnemyWeapon;
                     newEnemyWeapon = new EnemyWeapon(enemyWeaponTexture, e.Position.X, e.Position.Y + 75 - enemyWeaponTexture.Height / 2, 5);
@@ -462,7 +458,7 @@ namespace cs567_midterm
                 foreach (Boss b in bosses)
                 {
                     bossRectangle = b.Bounds;
-                    if( bossRectangle.Intersects(powerBeamRectangle))
+                    if (bossRectangle.Intersects(powerBeamRectangle))
                     {
                         b.bossLife--;
                         if (b.bossLife == 0)
@@ -565,7 +561,6 @@ namespace cs567_midterm
 
             if (bosses.Count < 1)
                 CreateNewBoss();
-
         }
 
         private void CreateNewBoss()
@@ -574,7 +569,6 @@ namespace cs567_midterm
 
             bossTemp = new Boss(bossTexture, currentPos + 500, 150, new Point(0, 0), new Point(6, 0), new Point(104, 106), new Point(6, 1), 6, 2f);
 
-            
             bosses.Add(bossTemp);
         }
 
@@ -621,6 +615,7 @@ namespace cs567_midterm
                 case GameState.Paused:
                     Draw_Paused(gameTime);
                     break;
+
                 case GameState.Boss:
                     Draw_Boss(gameTime);
                     break;
@@ -657,7 +652,6 @@ namespace cs567_midterm
         {
             display.DisplayBackGround(spriteBatch, cameraPosition);
 
-            
             player.Draw(spriteBatch);
 
             foreach (Weapon w in powerBeamWeapon)
@@ -679,7 +673,7 @@ namespace cs567_midterm
         private void Draw_Boss(GameTime gametime)
         {
             display.DisplayBackGround(spriteBatch, cameraPosition);
-            
+
             player.Draw(spriteBatch);
 
             foreach (Boss b in bosses)
@@ -695,7 +689,6 @@ namespace cs567_midterm
             {
                 w.Draw(spriteBatch);
             }
-            
 
             display.DisplayBossLife(spriteBatch, cameraPosition, bossLife);
         }

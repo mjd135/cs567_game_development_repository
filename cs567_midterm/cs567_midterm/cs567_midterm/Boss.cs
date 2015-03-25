@@ -17,11 +17,9 @@ namespace cs567_midterm
         private int millisecondsPerFrame = 100;
         private float spriteTimeSinceLastFrame;
         private float updateCounter;
-        private int updateRate;        
+        private int updateRate;
         public int bossLife;
         public bool isAlive;
-
-
 
         public Rectangle Bounds
         {
@@ -49,7 +47,7 @@ namespace cs567_midterm
             spriteSheetSize = sheetSize;
             spriteFrames = frames;
             spriteScale = scale;
-            
+
             updateCounter = 0;
             updateRate = 60;
             bossLife = 30;
@@ -96,7 +94,6 @@ namespace cs567_midterm
                     }
                 }
             }
-            
         }
     }
 }
